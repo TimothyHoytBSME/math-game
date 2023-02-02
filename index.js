@@ -104,7 +104,7 @@ const mainLoop = function(){
                 if(mouseDownCan){
                     if(((mdX >= pieceLeft)&&(mdX <= (pieceLeft+pieceSize)))&&((mdY >= pieceTop)&&(mdY <= (pieceTop+pieceSize)))){
                         if(verticalOrien){
-                            selected = [gridSize[0]-i-1, j]
+                            selected = [j, gridSize[0]-i-1]
                         }else{
                             selected = [i,j]
                         }
@@ -119,7 +119,7 @@ const mainLoop = function(){
                     if(((mX >= (pieceLeft+marg))&&(mX <= (pieceLeft+pieceSize-marg)))&&((mY >= (pieceTop+marg))&&(mY <= (pieceTop+pieceSize-marg)))){
                         
                         if(verticalOrien){
-                            target = [gridSize[0]-i-1, j]
+                            target = [j,gridSize[0]-i-1]
                         }else{
                             target = [i,j]
                         }
@@ -467,6 +467,7 @@ const checkRelease = function(){
         target = [-1,-1]
         chain = []
         formula = '??'
+        formVal = "??"
     }
 }
 
