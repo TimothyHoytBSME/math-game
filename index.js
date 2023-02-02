@@ -32,7 +32,7 @@ var noMovesLeft = false;
 const ops = ["+","×","-","÷"]
 var chain = []
 var formula = "no formula"
-
+var formVal = null;
 
 //Main Animation Loop
 const mainLoop = function(){
@@ -150,6 +150,18 @@ const mainLoop = function(){
                                     }
                                 }
                             }
+                        }else if(chain.length>0){
+                            //todo remove chain back to target
+                            var done = false
+                            while(!done){
+                                if(arrEq(chain[chain.length-1],target)){
+                                    done = true
+                                }else{
+                                    chain.pop()
+                                    upDateFormula()
+                                }
+                            }
+                            
                         }
                     }
                 }else{
@@ -308,7 +320,6 @@ const mainLoop = function(){
 }
 
 const upDateFormula = function(){
-    //todo update formula text to represent the math occuring in chain
     var parenthCount = 0
     formula = ""
     for(var i=(chain.length-1); i>=0; i--){
@@ -317,7 +328,6 @@ const upDateFormula = function(){
         formula = currentVal + formula
         
         if((currentVal == "÷")||(currentVal == "×")){
-            //todo check if prev op is + or -
             //if it is, add closing parenth, then currentval
             
             if(chain[i-2]){
@@ -331,11 +341,42 @@ const upDateFormula = function(){
         }
     }
 
-    //todo add open parenth for each close at beginning
     for(var i = 0; i<parenthCount; i++){
         formula = "(" + formula
     }
+
+    updateformval(parenthCount)
 }
+
+const updateformval = function(parCount){
+    var formcopy = formula
+    console.log('formcopy',formcopy)
+    for(var i=0; i<parCount; i++){
+        //todo replace inside parenth with equal value
+        var inside = ""
+        const start = parCount-i
+        inside = formcopy[start]
+        var stop = start + 1
+        while(formcopy[stop] != ")"){
+            inside = inside + formcopy[stop]
+            stop++
+        }
+        const insideVal = getValFromText(inside).toString()
+        const newform = formcopy.replace("("+inside+")",insideVal);
+        formcopy = newform
+        console.log('formcopy',formcopy)
+
+    }
+
+    const finalVal = getValFromText(formcopy).toString()
+    console.log("FINALVAL",finalVal)
+}
+
+const getValFromText = function(text){
+    return "hmm"
+}
+
+
 
 const checkRelease = function(){
     if(gameActive){
