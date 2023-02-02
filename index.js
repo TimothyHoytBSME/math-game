@@ -353,7 +353,7 @@ const upDateFormula = function(){
 
 const updateformval = function(parCount){
     var formcopy = formula
-    console.log('formcopy',formcopy)
+    console.log('formula',formcopy)
     for(var i=0; i<parCount; i++){
         //todo replace inside parenth with equal value
         var inside = ""
@@ -367,18 +367,20 @@ const updateformval = function(parCount){
         const insideVal = getValFromText(inside).toString()
         const newform = formcopy.replace("("+inside+")",insideVal);
         formcopy = newform
-        console.log('formcopy',formcopy)
+        // console.log('formcopy',formcopy)
 
     }
 
-    if(formcopy.length > 2){
-        console.log('attempting to calc', formcopy)
-        const finalVal = getValFromText(formcopy).toString()
-        console.log("FINALVAL",finalVal)
-        formVal = parseFloat(parseFloat(finalVal).toFixed(precision))
-    }else{
-        formVal = "??"
+    
+    
+    
+    // console.log('attempting to calc', formcopy)
+    const finalVal = getValFromText(formcopy).toString()
+    console.log("FINALVAL",finalVal)
+    if(!(finalVal == "??")){
+        formVal = parseFloat(parseFloat(finalVal).toFixed(precision)).toString()
     }
+    
     
 }
 
@@ -386,49 +388,73 @@ const updateformval = function(parCount){
 const getValFromText = function(text){
     var textcopy = text
     var lastchar = textcopy[textcopy.length-1]
-    console.log('calculating',textcopy)
     if((lastchar == "+")||(lastchar == "-")||(lastchar == "×")||(lastchar == "÷")){
         textcopy = textcopy.slice(0,-1);
-        console.log('removed unused operator',textcopy)
+        // console.log('removed unused operator',textcopy)
     }
 
-    //////////TODO!!!!!!!!!! handle decimal!!!!!!
-    var firstchar = textcopy[0]
-    var val = parseInt(textcopy[0])
-    if(firstchar == "-"){
-        val = -parseInt(textcopy[1])
-        textcopy = textcopy.slice(1,textcopy.length)
-        console.log('leading - removed', textcopy)
-    }
-    
 
-    for(var i=1; i<textcopy.length; i++){
-        if(isEven(i)){
-            //apply num with op to prev val
-            console.log('currentchar',textcopy[i])
-            const numb = parseInt(textcopy[i])
-            const op = textcopy[i-1]
-            switch(op) {
-                case "+":
-                    val = val+numb
-                    break;
-                case "-":
-                    val = val-numb
-                    break;
-                case "×":
-                    val = val*numb
-                    break;
-                case "÷":
-                    val = val/numb
-                    break;
-                default:
-                    val = val
-            }
-            console.log('valnextstep',val)
+    var docalc = false
+    for(var i=0; i< textcopy.length; i++){
+        if((textcopy[i] == "+")||(textcopy[i] == "-")||(textcopy[i] == "×")||(textcopy[i] == "÷")){
+            docalc = true
         }
     }
 
+    var val = "??"
 
+    if(docalc){
+        // console.log('calculating',textcopy)
+
+        var firstchar = textcopy[0]
+        val = 1
+        if(firstchar == "-"){
+            val = -1
+            textcopy = textcopy.slice(1,textcopy.length)
+            // console.log('leading - removed', textcopy)
+        }
+
+        var firstnumtext = ""
+        var done = false
+        while(!done){
+            if((textcopy[0] == "+")||(textcopy[0] == "-")||(textcopy[0] == "×")||(textcopy[0] == "÷")||(textcopy.length == 0)){
+                done = true
+            }else{
+                firstnumtext = firstnumtext + textcopy[0]
+                // console.log('building dec', firstnumtext)
+                textcopy = textcopy.slice(1,textcopy.length)
+            }
+        }
+
+        val = val*parseFloat(firstnumtext)
+        // console.log('firstVal',val)
+
+        for(var i=1; i<textcopy.length; i++){
+            if(!isEven(i)){
+                //apply num with op to prev val
+                // console.log('currentchar',textcopy[i])
+                const numb = parseInt(textcopy[i])
+                const op = textcopy[i-1]
+                switch(op) {
+                    case "+":
+                        val = val+numb
+                        break;
+                    case "-":
+                        val = val-numb
+                        break;
+                    case "×":
+                        val = val*numb
+                        break;
+                    case "÷":
+                        val = val/numb
+                        break;
+                    default:
+                        val = val
+                }
+                // console.log('valnextstep',val)
+            }
+        }
+    }
     return val
 }
 
@@ -440,7 +466,7 @@ const checkRelease = function(){
         selected = [-1,-1]
         target = [-1,-1]
         chain = []
-        formula = 'no formula'
+        formula = '??'
     }
 }
 
