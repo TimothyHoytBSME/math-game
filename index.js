@@ -31,8 +31,9 @@ var noMovesLeft = false;
 // var genTolerance = 200;
 const ops = ["+","×","-","÷"]
 var chain = []
-var formula = "no formula"
-var formVal = null;
+var formula = "??"
+var formVal = "??";
+const precision = 4;
 
 //Main Animation Loop
 const mainLoop = function(){
@@ -237,15 +238,17 @@ const mainLoop = function(){
 
 
         //todo FORMULA TEXT
+
+        const valtodisp = formula + " = " + formVal
         ctx.textAlign = "center"
         ctx.textBaseline = 'middle'
         if(verticalOrien){
-            shadowText(gameCent[0], gameRec[3]*0.9+gameRec[1], formula, "black")
-            fillText(gameCent[0], gameRec[3]*0.9+gameRec[1], formula, "white")
+            shadowText(gameCent[0], gameRec[3]*0.9+gameRec[1], valtodisp, "black")
+            fillText(gameCent[0], gameRec[3]*0.9+gameRec[1], valtodisp, "white")
             
         }else{
-            shadowText(gameCent[0], gameRec[3]*0.95+gameRec[1], formula, "black")
-            fillText(gameCent[0], gameRec[3]*0.95+gameRec[1], formula, "white")
+            shadowText(gameCent[0], gameRec[3]*0.95+gameRec[1], valtodisp, "black")
+            fillText(gameCent[0], gameRec[3]*0.95+gameRec[1], valtodisp, "white")
         }
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
@@ -372,6 +375,9 @@ const updateformval = function(parCount){
         console.log('attempting to calc', formcopy)
         const finalVal = getValFromText(formcopy).toString()
         console.log("FINALVAL",finalVal)
+        formVal = parseFloat(parseFloat(finalVal).toFixed(precision))
+    }else{
+        formVal = "??"
     }
     
 }
@@ -386,6 +392,7 @@ const getValFromText = function(text){
         console.log('removed unused operator',textcopy)
     }
 
+    //////////TODO!!!!!!!!!! handle decimal!!!!!!
     var firstchar = textcopy[0]
     var val = parseInt(textcopy[0])
     if(firstchar == "-"){
@@ -550,10 +557,12 @@ const genGrid = function(){
             }
             gameGrid.push(row)
         }
+        console.log('opCount',opCount)
         if(((opCount)<opMin)||((opCount)>opMax)){
             console.log('opMin', opMin, 'opMax', opMax)
-            console.log('ratio out of range, redoing',opCount)
+            console.log('ratio out of range, redoing')
             opCount = 0;
+            gameGrid = []
             ranGrid()
         }
     }
