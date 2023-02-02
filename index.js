@@ -34,6 +34,7 @@ var chain = []
 var formula = "??"
 var formVal = "??";
 const precision = 4;
+var textH = 10
 
 //Main Animation Loop
 const mainLoop = function(){
@@ -110,7 +111,8 @@ const mainLoop = function(){
                         }
                         if((!includesPoint(chain,selected))&&(gameGrid[selected[0]][selected[1]].type == "number")){
                             chain.push([...selected])
-                            upDateFormula()
+                            formula = makeFormula(chain)
+                            formVal = getValFromFormula(formula)
                         }
                         
                         // console.log(chain)
@@ -142,12 +144,14 @@ const mainLoop = function(){
                                     if(gameGrid[target[0]][target[1]].type == "operator"){
                                         // console.log('prevtargtype',gameGrid[prev[0]][prev[1]].type,gameGrid[target[0]][target[1]].type)
                                         chain.push([...target])
-                                        upDateFormula()
+                                        formula = makeFormula(chain)
+                                        formVal = getValFromFormula(formula)
                                     }
                                 }else{
                                     if(gameGrid[target[0]][target[1]].type == "number"){
                                         chain.push([...target])
-                                        upDateFormula()
+                                        formula = makeFormula(chain)
+                                        formVal = getValFromFormula(formula)
                                     }
                                 }
                             }
@@ -159,7 +163,8 @@ const mainLoop = function(){
                                     done = true
                                 }else{
                                     chain.pop()
-                                    upDateFormula()
+                                    formula = makeFormula(chain)
+                                    formVal = getValFromFormula(formula)
                                 }
                             }
                             
@@ -204,7 +209,7 @@ const mainLoop = function(){
     
     const textXoff = textW/8
     const textYoff = textW/12
-    const textH = textW*0.375
+    textH = textW*0.375
 
     if(gameActive){
         undoBox = [gameRec[0]+textXoff, gameRec[1]+textYoff, textW, textH]
@@ -243,12 +248,12 @@ const mainLoop = function(){
         ctx.textAlign = "center"
         ctx.textBaseline = 'middle'
         if(verticalOrien){
-            shadowText(gameCent[0], gameRec[3]*0.9+gameRec[1], valtodisp, "black")
-            fillText(gameCent[0], gameRec[3]*0.9+gameRec[1], valtodisp, "white")
+            shadowText(gameCent[0], gameRec[3]*0.9+gameRec[1], valtodisp,textH*0.75, "black")
+            fillText(gameCent[0], gameRec[3]*0.9+gameRec[1], valtodisp,textH*0.75, "white")
             
         }else{
-            shadowText(gameCent[0], gameRec[3]*0.95+gameRec[1], valtodisp, "black")
-            fillText(gameCent[0], gameRec[3]*0.95+gameRec[1], valtodisp, "white")
+            shadowText(gameCent[0], gameRec[3]*0.95+gameRec[1], valtodisp,textH*0.75, "black")
+            fillText(gameCent[0], gameRec[3]*0.95+gameRec[1], valtodisp,textH*0.75, "white")
         }
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
@@ -322,38 +327,51 @@ const mainLoop = function(){
     dlastLapse = lapse;
 }
 
-const upDateFormula = function(){
+const makeFormula = function(theChain){
     var parenthCount = 0
-    formula = ""
-    for(var i=(chain.length-1); i>=0; i--){
-        const currentVal = gameGrid[chain[i][0]][chain[i][1]].value
+    var theFormula = ""
+    for(var i=(theChain.length-1); i>=0; i--){
+        const currentVal = gameGrid[theChain[i][0]][theChain[i][1]].value
         
-        formula = currentVal + formula
+        theFormula = currentVal + theFormula
         
         if((currentVal == "÷")||(currentVal == "×")){
             //if it is, add closing parenth, then currentval
             
-            if(chain[i-2]){
-                prevOp = gameGrid[chain[i-2][0]][chain[i-2][1]].value
+            if(theChain[i-2]){
+                prevOp = gameGrid[theChain[i-2][0]][theChain[i-2][1]].value
                 if((prevOp =="+")||(prevOp == "-")){
                     //need parenth
                     parenthCount++
-                    formula = ")" + formula
+                    theFormula = ")" + theFormula
                 }
             }
         }
     }
 
     for(var i = 0; i<parenthCount; i++){
-        formula = "(" + formula
+        theFormula = "(" + theFormula
     }
 
-    updateformval(parenthCount)
+    return theFormula
 }
 
-const updateformval = function(parCount){
-    var formcopy = formula
-    console.log('formula',formcopy)
+const getValFromFormula = function(theFormula){
+    var parCount = 0
+    var done = false;
+    var ind = 0
+    while(!done){
+        // console.log(theFormula[ind])
+        if(theFormula[ind] == "("){
+            parCount++
+        }else{
+            done = true
+        }
+        ind++
+    }
+
+    var formcopy = theFormula
+    console.log('theFormula',formcopy)
     for(var i=0; i<parCount; i++){
         //todo replace inside parenth with equal value
         var inside = ""
@@ -378,10 +396,10 @@ const updateformval = function(parCount){
     const finalVal = getValFromText(formcopy).toString()
     console.log("FINALVAL",finalVal)
     if(!(finalVal == "??")){
-        formVal = parseFloat(parseFloat(finalVal).toFixed(precision)).toString()
+        return parseFloat(parseFloat(finalVal).toFixed(precision)).toString()
     }
-    
-    
+
+    return "??"
 }
 
 
