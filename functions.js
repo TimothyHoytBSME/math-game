@@ -61,6 +61,15 @@ const includesPoint = function(arr, point){
     return false
 }
 
+const isEven = function(num){
+    if(num % 2==0){
+        return true
+    }else {
+        return false
+    }
+    return null
+}
+
 // const colEq = function(a,b, tol){
 //     const as = a.length
 //     const bs = b.length

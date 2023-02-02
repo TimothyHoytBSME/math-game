@@ -368,12 +368,61 @@ const updateformval = function(parCount){
 
     }
 
-    const finalVal = getValFromText(formcopy).toString()
-    console.log("FINALVAL",finalVal)
+    if(formcopy.length > 2){
+        console.log('attempting to calc', formcopy)
+        const finalVal = getValFromText(formcopy).toString()
+        console.log("FINALVAL",finalVal)
+    }
+    
 }
 
+
 const getValFromText = function(text){
-    return "hmm"
+    var textcopy = text
+    var lastchar = textcopy[textcopy.length-1]
+    console.log('calculating',textcopy)
+    if((lastchar == "+")||(lastchar == "-")||(lastchar == "×")||(lastchar == "÷")){
+        textcopy = textcopy.slice(0,-1);
+        console.log('removed unused operator',textcopy)
+    }
+
+    var firstchar = textcopy[0]
+    var val = parseInt(textcopy[0])
+    if(firstchar == "-"){
+        val = -parseInt(textcopy[1])
+        textcopy = textcopy.slice(1,textcopy.length)
+        console.log('leading - removed', textcopy)
+    }
+    
+
+    for(var i=1; i<textcopy.length; i++){
+        if(isEven(i)){
+            //apply num with op to prev val
+            console.log('currentchar',textcopy[i])
+            const numb = parseInt(textcopy[i])
+            const op = textcopy[i-1]
+            switch(op) {
+                case "+":
+                    val = val+numb
+                    break;
+                case "-":
+                    val = val-numb
+                    break;
+                case "×":
+                    val = val*numb
+                    break;
+                case "÷":
+                    val = val/numb
+                    break;
+                default:
+                    val = val
+            }
+            console.log('valnextstep',val)
+        }
+    }
+
+
+    return val
 }
 
 
