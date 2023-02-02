@@ -47,6 +47,20 @@ const arrEq = function(a,b){
     return true
 }
 
+const includesPoint = function(arr, point){
+    if(point.length != 2) return false
+    if(!arr[0]) return false
+    if(arr[0].length != 2) return false
+    for(var i=0; i<arr.length; i++){
+        if(arr[i][0]==point[0]){
+            if(arr[i][1]==point[1]){
+                return true
+            }
+        }
+    }
+    return false
+}
+
 // const colEq = function(a,b, tol){
 //     const as = a.length
 //     const bs = b.length

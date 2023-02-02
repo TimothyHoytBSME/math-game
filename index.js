@@ -31,6 +31,7 @@ var noMovesLeft = false;
 // var genTolerance = 200;
 const ops = ["+","×","-","÷"]
 var chain = []
+var formula = "no formula"
 
 
 //Main Animation Loop
@@ -71,18 +72,23 @@ const mainLoop = function(){
                 const gridSizePix = [gridSize[0]*size, gridSize[1]*size]
                 var gridPos = [gameCent[0]-gridSizePix[0]/2, gameCent[1]-gridSizePix[1]/2]
                 var piece = [1,1,1]
+                var isInChain = false
                 if(verticalOrien){
                     piece = gameGrid[j][gridSize[0]-i-1]
+                    isInChain = includesPoint(chain,[j,gridSize[0]-i-1])
                 }else{
                     piece = gameGrid[i][j]
                     gridPos = [gridPos[0], gridPos[1]-marg*3]
+                    isInChain = includesPoint(chain,[i,j])
                 }
                 pieceSize = size-marg;
                 const pieceLeft = gridPos[0]+i*size+marg/2
                 const pieceTop = gridPos[1]+j*size+marg/2
                 
+
                 // console.log('drawing piece', piece)
-                fillRec([ pieceLeft, pieceTop, pieceSize, pieceSize], colText(piece.color))
+                var pieceColor = isInChain? [123,123,0] : piece.color
+                fillRec([ pieceLeft, pieceTop, pieceSize, pieceSize], colText(pieceColor))
 
 
                 //todo draw piece.value
@@ -101,15 +107,49 @@ const mainLoop = function(){
                         }else{
                             selected = [i,j]
                         }
+                        if((!includesPoint(chain,selected))&&(gameGrid[selected[0]][selected[1]].type == "number")){
+                            chain.push([...selected])
+                            upDateFormula()
+                        }
                         
+                        // console.log(chain)
                     }
 
-                    if(((mX >= pieceLeft)&&(mX <= (pieceLeft+pieceSize)))&&((mY >= pieceTop)&&(mY <= (pieceTop+pieceSize)))){
+                    if(((mX >= (pieceLeft+marg))&&(mX <= (pieceLeft+pieceSize-marg)))&&((mY >= (pieceTop+marg))&&(mY <= (pieceTop+pieceSize-marg)))){
                         
                         if(verticalOrien){
                             target = [gridSize[0]-i-1, j]
                         }else{
                             target = [i,j]
+                        }
+                        if((!includesPoint(chain,target))&&(chain.length>0)){
+                            prev = chain[chain.length-1]
+                            const choices = [
+                                [prev[0],prev[1]+1],
+                                [prev[0],prev[1]-1],
+                                [prev[0]-1,prev[1]-1],
+                                [prev[0]-1,prev[1]],
+                                [prev[0]-1,prev[1]+1],
+                                [prev[0]+1,prev[1]-1],
+                                [prev[0]+1,prev[1]],
+                                [prev[0]+1,prev[1]+1]
+                            ]
+                            // console.log('target',target, 'prev', prev)
+                            // console.log('choices',choices)
+                            if(includesPoint(choices,target)){
+                                if(gameGrid[prev[0]][prev[1]].type == "number"){
+                                    if(gameGrid[target[0]][target[1]].type == "operator"){
+                                        // console.log('prevtargtype',gameGrid[prev[0]][prev[1]].type,gameGrid[target[0]][target[1]].type)
+                                        chain.push([...target])
+                                        upDateFormula()
+                                    }
+                                }else{
+                                    if(gameGrid[target[0]][target[1]].type == "number"){
+                                        chain.push([...target])
+                                        upDateFormula()
+                                    }
+                                }
+                            }
                         }
                     }
                 }else{
@@ -183,6 +223,20 @@ const mainLoop = function(){
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
 
+
+        //todo FORMULA TEXT
+        ctx.textAlign = "center"
+        ctx.textBaseline = 'middle'
+        if(verticalOrien){
+            shadowText(gameCent[0], gameRec[3]*0.9+gameRec[1], formula, "black")
+            fillText(gameCent[0], gameRec[3]*0.9+gameRec[1], formula, "white")
+            
+        }else{
+            shadowText(gameCent[0], gameRec[3]*0.95+gameRec[1], formula, "black")
+            fillText(gameCent[0], gameRec[3]*0.95+gameRec[1], formula, "white")
+        }
+        ctx.textAlign = "left"
+        ctx.textBaseline = 'bottom'
         
         
         if(noMovesLeft&&(!winner)&&(!wonThis)){
@@ -222,10 +276,9 @@ const mainLoop = function(){
         shadowText(gameCent[0], gameCent[1], message1, textH, "black")
         fillText(gameCent[0], gameCent[1], message1, textH, "white")
 
-        var message2 = "MATCH BACKGROUND"
+        var message2 = "INSTRUCTIONS LINE 2"
         shadowText(gameCent[0], gameCent[1]+textH, message2, textH, "black")
         fillText(gameCent[0], gameCent[1]+textH, message2, textH, "white")
-
         ctx.textAlign = 'left'
     }
 
@@ -254,11 +307,43 @@ const mainLoop = function(){
     dlastLapse = lapse;
 }
 
+const upDateFormula = function(){
+    //todo update formula text to represent the math occuring in chain
+    var parenthCount = 0
+    formula = ""
+    for(var i=(chain.length-1); i>=0; i--){
+        const currentVal = gameGrid[chain[i][0]][chain[i][1]].value
+        
+        formula = currentVal + formula
+        
+        if((currentVal == "÷")||(currentVal == "×")){
+            //todo check if prev op is + or -
+            //if it is, add closing parenth, then currentval
+            
+            if(chain[i-2]){
+                prevOp = gameGrid[chain[i-2][0]][chain[i-2][1]].value
+                if((prevOp =="+")||(prevOp == "-")){
+                    //need parenth
+                    parenthCount++
+                    formula = ")" + formula
+                }
+            }
+        }
+    }
+
+    //todo add open parenth for each close at beginning
+    for(var i = 0; i<parenthCount; i++){
+        formula = "(" + formula
+    }
+}
+
 const checkRelease = function(){
     if(gameActive){
         //Todo release action
         selected = [-1,-1]
         target = [-1,-1]
+        chain = []
+        formula = 'no formula'
     }
 }
 
@@ -356,7 +441,8 @@ const genGrid = function(){
                 //todo, make actual pieces
                 piece = {
                     color: [123,123,123],
-                    value: "9"
+                    value: "9",
+                    type: "number"
                 }
 
                 piece.value = floor(random()*9+1).toString()
@@ -364,7 +450,9 @@ const genGrid = function(){
                 if(random() < opRatio){
                     //operator
                     piece.value = ops[floor(random()*4)]
+                    piece.type = "operator"
                     opCount++
+                    
                 }   
 
 
