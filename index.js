@@ -12,7 +12,7 @@ var backColor = [20,20,20];
 var gridHistory = []
 var gameCent = []
 var gameGrid = []
-var gridDims = [7,6]
+var gridDims = [6,5]
 // var solution = []
 var undoBox = []
 var newBox = []
@@ -29,7 +29,8 @@ var noMovesLeft = false;
 // const genTolMult = 10; //fundamental
 // var matchTolerance = 300;
 // var genTolerance = 200;
-
+const ops = ["+","×","-","÷"]
+var chain = []
 
 
 //Main Animation Loop
@@ -87,7 +88,7 @@ const mainLoop = function(){
                 //todo draw piece.value
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
-                shadowText(pieceLeft+pieceSize/2, pieceTop+pieceSize/2, piece.value, pieceSize/2, "black")
+                // shadowText(pieceLeft+pieceSize/2, pieceTop+pieceSize/2, piece.value, pieceSize/2, "black")
                 fillText(pieceLeft+pieceSize/2, pieceTop+pieceSize/2, piece.value, pieceSize/2, "white")
                 ctx.textAlign = 'left'
                 ctx.textBaseline = 'bottom'
@@ -256,6 +257,8 @@ const mainLoop = function(){
 const checkRelease = function(){
     if(gameActive){
         //Todo release action
+        selected = [-1,-1]
+        target = [-1,-1]
     }
 }
 
@@ -340,21 +343,44 @@ const genGrid = function(){
 
     console.log('generating new grid')
     gameGrid = []
-    
-    for(var i=0; i<gridDims[0]; i++){
-        const row = []
-        for(var j=0; j<gridDims[1]; j++){
-            var piece = []
-            //todo, make actual pieces
-            piece = {
-                color: [123,123,123],
-                value: "9"
+    const tot = gridDims[0]*gridDims[1]
+    const opRatio = 0.3
+    const opMin = 0.9*opRatio*tot
+    const opMax = 1.1*opRatio*tot
+    var opCount = 0
+    const ranGrid = function(){
+        for(var i=0; i<gridDims[0]; i++){
+            const row = []
+            for(var j=0; j<gridDims[1]; j++){
+                var piece = []
+                //todo, make actual pieces
+                piece = {
+                    color: [123,123,123],
+                    value: "9"
+                }
+
+                piece.value = floor(random()*9+1).toString()
+
+                if(random() < opRatio){
+                    //operator
+                    piece.value = ops[floor(random()*4)]
+                    opCount++
+                }   
+
+
+                row.push(piece)
             }
-            row.push(piece)
+            gameGrid.push(row)
         }
-        gameGrid.push(row)
+        if(((opCount)<opMin)||((opCount)>opMax)){
+            console.log('opMin', opMin, 'opMax', opMax)
+            console.log('ratio out of range, redoing',opCount)
+            opCount = 0;
+            ranGrid()
+        }
     }
-    
+
+    ranGrid()
 
     console.log('grid', gameGrid)
 
