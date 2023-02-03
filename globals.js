@@ -2,7 +2,7 @@
 //globals
 ////////////////
 
-//primary elements
+const root = document.documentElement;
 const canvas = document.createElement('canvas');
 const mainDiv = document.getElementsByTagName('main')[0]
 mainDiv.appendChild(canvas)
@@ -13,7 +13,6 @@ const gametypeDiv = document.getElementById('gametype')
 
 difficultyDiv.onchange = ()=>{  
     difficulty = difficultyDiv.selectedIndex
-    //todo load grid for each difficulty or gen new, keep score for each combo
     if(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum][0]){
         gameGrid = JSON.parse(JSON.stringify(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]))
         currentGoal = goals[difficulty*typesOfGoals.length + typeOfGoalNum]
@@ -27,7 +26,6 @@ gametypeDiv.onchange = ()=>{
     typeOfGoal = typesOfGoals[ind]
     typeOfGoalNum = ind
     console.log("game type changed", typeOfGoal)
-    //todo load grid for each difficulty or gen new, keep score for each combo
     if(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]){
         gameGrid = JSON.parse(JSON.stringify(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]))
         currentGoal = goals[difficulty*typesOfGoals.length + typeOfGoalNum]
@@ -35,7 +33,6 @@ gametypeDiv.onchange = ()=>{
         genGrid()
     }
 }
-//universal constants
 
 const startTime = new Date();
 
@@ -67,6 +64,8 @@ const marg = 10;
 const gameRec = [marg, marg,100,100]
 var rat = 16/9;
 
+
+//Mute button setup
 var un_mute = document.getElementById('un-mute');
 var muteimages = document.getElementsByClassName('muteimage')
 
@@ -88,5 +87,3 @@ un_mute.onclick = function() {
     }
 };
 
-
-let root = document.documentElement;
