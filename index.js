@@ -35,10 +35,11 @@ var formVal = "??";
 const precision = 4;
 var textH = 10
 var currentGoal = "99999999.99";
-var difficulty = 1 //must be integer between 0 and 2 (easy, challenge, impossible)
+var difficulty = 0 //must be integer between 0 and 2 (easy, challenge, impossible)
 var difficulties = ["EASY","CHALLENGE","IMPOSSIBLE"]
 var typesOfGoals = ["integer", "both", "decimal"]
-var typeOfGoal = "decimal" // or "decimal" or "integer"
+var typOfGoalNum = 0
+var typeOfGoal = "integer" // or "decimal" or "integer"
 var score = [0,0,0,0,0,0,0]; //EASY(int,both,dec),CHALLENGE(int,both,dec),IMPOSSIBLE(int,both,dec)
 var calculatingGoal = false;
 
@@ -239,8 +240,8 @@ const mainLoop = function(){
         if(verticalOrien){
             shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "black")
             fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "white")
-            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty].toString(), textH*0.75, "black")
-            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty].toString(), textH*0.75, "white")
+            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typOfGoalNum].toString(), textH*0.75, "black")
+            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typOfGoalNum].toString(), textH*0.75, "white")
 
             shadowText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "black")
             fillText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "white")
@@ -249,8 +250,8 @@ const mainLoop = function(){
         }else{
             shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*3, "SCORE", textH*0.75, "black")
             fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*3, "SCORE", textH*0.75, "white")
-            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty].toString(), textH*0.75, "black")
-            fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty].toString(), textH*0.75, "white")
+            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty*typesOfGoals.length + typOfGoalNum].toString(), textH*0.75, "black")
+            fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty*typesOfGoals.length + typOfGoalNum].toString(), textH*0.75, "white")
 
             shadowText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, "GOAL", textH*0.75, "black")
             fillText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, "GOAL", textH*0.75, "white")
@@ -497,7 +498,7 @@ const checkRelease = function(){
     if(gameActive){
         if(formVal == currentGoal){
             console.log('match made')
-            score[difficulty]++
+            score[difficulty*typesOfGoals.length + typOfGoalNum]++
             ///////////todo delete and replace tile values:
 
             //if chain count is even, remove last (ends in op)
@@ -645,7 +646,9 @@ const genGrid = function(){
 
     console.log('generating new grid')
     gameGrid = []
-    score[difficulty] = 0;
+    score[difficulty*typesOfGoals.length + typOfGoalNum] = 0;
+
+    console.log("scores", score)
     const tot = gridDims[0]*gridDims[1]
     const opRatio = 0.3
     const opNum = 8

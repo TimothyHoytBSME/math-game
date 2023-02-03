@@ -20,6 +20,7 @@ difficultyDiv.onchange = ()=>{
 gametypeDiv.onchange = ()=>{
     var ind = gametypeDiv.selectedIndex
     typeOfGoal = typesOfGoals[ind]
+    typOfGoalNum = ind
     console.log("game type changed", typeOfGoal)
     //todo load grid for each difficulty or gen new, keep score for each combo
     genGrid();
