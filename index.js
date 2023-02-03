@@ -38,9 +38,11 @@ var currentGoal = "99999999.99";
 var difficulty = 0 //must be integer between 0 and 2 (easy, challenge, impossible)
 var difficulties = ["EASY","CHALLENGE","IMPOSSIBLE"]
 var typesOfGoals = ["integer", "both", "decimal"]
-var typOfGoalNum = 0
+var typeOfGoalNum = 0
 var typeOfGoal = "integer" // or "decimal" or "integer"
-var score = [0,0,0,0,0,0,0]; //EASY(int,both,dec),CHALLENGE(int,both,dec),IMPOSSIBLE(int,both,dec)
+var score = [0,0,0,0,0,0,0,0,0]; //EASY(int,both,dec),CHALLENGE(int,both,dec),IMPOSSIBLE(int,both,dec)v
+var gameGrids = new Array(score.length).fill([])
+var goals = new Array(score.length).fill("9999999999.88")
 var calculatingGoal = false;
 
 
@@ -240,8 +242,8 @@ const mainLoop = function(){
         if(verticalOrien){
             shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "black")
             fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "white")
-            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typOfGoalNum].toString(), textH*0.75, "black")
-            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typOfGoalNum].toString(), textH*0.75, "white")
+            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typeOfGoalNum].toString(), textH*0.75, "black")
+            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typeOfGoalNum].toString(), textH*0.75, "white")
 
             shadowText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "black")
             fillText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "white")
@@ -250,8 +252,8 @@ const mainLoop = function(){
         }else{
             shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*3, "SCORE", textH*0.75, "black")
             fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*3, "SCORE", textH*0.75, "white")
-            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty*typesOfGoals.length + typOfGoalNum].toString(), textH*0.75, "black")
-            fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty*typesOfGoals.length + typOfGoalNum].toString(), textH*0.75, "white")
+            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty*typesOfGoals.length + typeOfGoalNum].toString(), textH*0.75, "black")
+            fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty*typesOfGoals.length + typeOfGoalNum].toString(), textH*0.75, "white")
 
             shadowText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, "GOAL", textH*0.75, "black")
             fillText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, "GOAL", textH*0.75, "white")
@@ -498,7 +500,7 @@ const checkRelease = function(){
     if(gameActive){
         if(formVal == currentGoal){
             console.log('match made')
-            score[difficulty*typesOfGoals.length + typOfGoalNum]++
+            score[difficulty*typesOfGoals.length + typeOfGoalNum]++
             ///////////todo delete and replace tile values:
 
             //if chain count is even, remove last (ends in op)
@@ -538,6 +540,7 @@ const checkRelease = function(){
                             divPlaced = true
                         }
                         gameGrid[point[0]][point[1]].value = newOp
+                        gameGrid[point[0]][point[1]].type = "operator"
                         changed[randI] = true
                         found = true
                     }
@@ -548,13 +551,19 @@ const checkRelease = function(){
             for(var i=0; i<chain.length;i++){
                 if(!changed[i]){
                     var point =[...chain[i]]
-                    gameGrid[point[0]][point[1]].value = floor(random()*8+1)
+                    gameGrid[point[0]][point[1]].value = floor(random()*9+1)
+                    gameGrid[point[0]][point[1]].type = "number"
+
                     changed[i]=true
                 }
             }
 
+            gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum] = JSON.parse(JSON.stringify(gameGrid))
+            
             //generate new goal
             genGoal()
+
+            saveGame()
         }
         selected = [-1,-1]
         target = [-1,-1]
@@ -570,6 +579,7 @@ const doNew = function(){
     // }
     // wonThis = false;
     // gridHistory = []
+    score[difficulty*typesOfGoals.length + typeOfGoalNum] = 0;
     genGrid()
 }
 
@@ -646,7 +656,7 @@ const genGrid = function(){
 
     console.log('generating new grid')
     gameGrid = []
-    score[difficulty*typesOfGoals.length + typOfGoalNum] = 0;
+    // score[difficulty*typesOfGoals.length + typeOfGoalNum] = 0;
 
     console.log("scores", score)
     const tot = gridDims[0]*gridDims[1]
@@ -716,6 +726,7 @@ const genGrid = function(){
 
     genGoal()
 
+    gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum] = JSON.parse(JSON.stringify(gameGrid))
 
     saveGame()
 }
@@ -730,6 +741,7 @@ const genGoal = function(){
         goalAttempts = 0
         console.error('MAX GOAL ATTEMPTS REACHED, NEW GRID')
         genGrid()
+        return
     }
 
     const wid = Math.min(gameRec[2],gameRec[3])/2
@@ -884,6 +896,7 @@ const genGoal = function(){
     
 
     currentGoal = theVal
+    goals[difficulty*typesOfGoals.length + typeOfGoalNum] = theVal
     console.log('goalFormula',goalForm)
     console.log('goalVal',theVal)
 
@@ -921,38 +934,51 @@ const getRandomNeighbor = function(point){
 
 //todo save the necessities
 const saveGame = function(){
-    // const gameObj = {
-    //     "gameGrid": gameGrid,
-    //     "backColor": backColor,
-    //     // "gridHistory": gridHistory,
-    //     "score": score,
-    //     "gridDims": gridDims
-    // }
+    const gameObj = {
+        "gameGrids": JSON.parse(JSON.stringify(gameGrids)),
+        "typeOfGoalNum": typeOfGoalNum,
+        "typeOfGoal": typeOfGoal,
+        "difficulty": difficulty,
+        "score": [...score],
+        "gridDims": [...gridDims],
+        "goals": [...goals]
+    }
 
-    // const gameString = JSON.stringify(gameObj)
-    // window.localStorage.setItem(Version,gameString)
-    // console.log("GAME SAVED")
+    const gameString = JSON.stringify(gameObj)
+    window.localStorage.setItem(Version,gameString)
+    console.log("GAME SAVED")
 }
 
 
-//TODO Load game
-/*
-if (!(localStorage.getItem(Version) === null)) {
-    //load game
-    const gameObj = JSON.parse(window.localStorage.getItem(Version))
-    gameGrid = gameObj.gameGrid
-    backColor = gameObj.backColor
-    // gridHistory = gameObj.gridHistory
-    score = gameObj.score
-    gridDims = gameObj.gridDims
-    console.log('GAME LOADED FROM STORAGE')
-    console.log(JSON.stringify(gameObj))
-}else{
+const loadGameDataIfAble = function(){
+    if (!(localStorage.getItem(Version) === null)) {
+        //load game
+        const gameObj = JSON.parse(window.localStorage.getItem(Version))
+        gameGrids = JSON.parse(JSON.stringify(gameObj.gameGrids))
+        typeOfGoalNum = gameObj.typeOfGoalNum
+        typeOfGoal = gameObj.typeOfGoal
+        difficulty = gameObj.difficulty
+        difficultyDiv.selectedIndex = difficulty
+        gametypeDiv.selectedIndex = typeOfGoalNum
+        score = [...gameObj.score]
+        gridDims = [...gameObj.gridDims]
+        goals = [...gameObj.goals]
+        gameGrid = JSON.parse(JSON.stringify(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]))
+        currentGoal = goals[difficulty*typesOfGoals.length + typeOfGoalNum]
+        
+        
 
-    genGrid()
+        console.log('GAME LOADED FROM STORAGE')
+        console.log(JSON.stringify(gameObj))
+    }else{
+    
+        genGrid()
+    }
 }
 
-*/
+loadGameDataIfAble()
 
-genGrid()
+
+
+// genGrid()
 

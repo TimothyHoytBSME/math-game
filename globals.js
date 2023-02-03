@@ -14,16 +14,26 @@ const gametypeDiv = document.getElementById('gametype')
 difficultyDiv.onchange = ()=>{  
     difficulty = difficultyDiv.selectedIndex
     //todo load grid for each difficulty or gen new, keep score for each combo
-    genGrid()
+    if(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum][0]){
+        gameGrid = JSON.parse(JSON.stringify(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]))
+        currentGoal = goals[difficulty*typesOfGoals.length + typeOfGoalNum]
+    }else{
+        genGrid()
+    }
 }
 
 gametypeDiv.onchange = ()=>{
     var ind = gametypeDiv.selectedIndex
     typeOfGoal = typesOfGoals[ind]
-    typOfGoalNum = ind
+    typeOfGoalNum = ind
     console.log("game type changed", typeOfGoal)
     //todo load grid for each difficulty or gen new, keep score for each combo
-    genGrid();
+    if(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]){
+        gameGrid = JSON.parse(JSON.stringify(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]))
+        currentGoal = goals[difficulty*typesOfGoals.length + typeOfGoalNum]
+    }else{
+        genGrid()
+    }
 }
 //universal constants
 
