@@ -60,7 +60,7 @@ var mouseDownCan = false; var verticalOrien = false;
 var firstFrame = true; 
 var clastLapse = 0; var dlastLapse = 0;
 var time = 0;
-const marg = 10;
+var marg = 10;
 const gameRec = [marg, marg,100,100]
 var rat = 16/9;
 

@@ -31,6 +31,7 @@ var score = [0,0,0,0,0,0,0,0,0]; //EASY(int,both,dec),CHALLENGE(int,both,dec),IM
 var gameGrids = new Array(score.length).fill([])
 var goals = new Array(score.length).fill("9999999999.88")
 var calculatingGoal = false;
+var justScored = false;
 // var requestNew = false;
 
 
@@ -52,11 +53,13 @@ const mainLoop = function(){
         if(verticalOrien){
             gridSize[0] = gridDims[1]
             gridSize[1] = gridDims[0]
+            marg = gameRec[2]/35;
             size = (gameRec[2]-marg*2)/gridSize[0]
         }else{
             gridSize[1] = gridDims[1]
             gridSize[0] = gridDims[0]
-            size = (gameRec[3]-marg*8)/gridSize[1]
+            marg = gameRec[3]/35;
+            size = (gameRec[3]-marg*4)/gridSize[1]
         }
 
         for(var i = 0; i<gridSize[0]; i++){
@@ -71,7 +74,7 @@ const mainLoop = function(){
                     isInChain = includesPoint(chain,[j,gridSize[0]-i-1])
                 }else{
                     piece = gameGrid[i][j]
-                    gridPos = [gridPos[0], gridPos[1]-marg*3]
+                    gridPos = [gridPos[0], gridPos[1]-marg*1.5]
                     isInChain = includesPoint(chain,[i,j])
                 }
                 pieceSize = size-marg;
@@ -98,6 +101,7 @@ const mainLoop = function(){
                             chain.push([...selected])
                             formula = makeFormula(chain)
                             formVal = getValFromFormula(formula)
+                            soundPlayed = false
                         }
                     }
 
@@ -127,12 +131,14 @@ const mainLoop = function(){
                                         chain.push([...target])
                                         formula = makeFormula(chain)
                                         formVal = getValFromFormula(formula)
+                                        soundPlayed = false
                                     }
                                 }else{
                                     if(gameGrid[target[0]][target[1]].type == "number"){
                                         chain.push([...target])
                                         formula = makeFormula(chain)
                                         formVal = getValFromFormula(formula)
+                                        soundPlayed = false
                                     }
                                 }
                             }
@@ -174,13 +180,13 @@ const mainLoop = function(){
     textH = textW*0.375
 
     if(gameActive){
-        undoBox = [gameRec[0]+textXoff, gameRec[1]+textYoff, textW, textH]
+        // undoBox = [gameRec[0]+textXoff, gameRec[1]+textYoff, textW, textH]
         
-        newBox = [gameRec[0]+gameRec[2]-textW, gameRec[1]+textYoff, textW*0.75, textH]
+        newBox = [gameRec[0]+textXoff, gameRec[1]+gameRec[3]-textH, textW, textH]
         shadowText(newBox[0], newBox[1]+newBox[3], "NEW", newBox[3], "black")
         fillText(newBox[0], newBox[1]+newBox[3], "NEW", newBox[3], "white")
 
-        resetBox = [gameRec[0]+textXoff, gameRec[1]+gameRec[3]-textH, textW, textH]
+        // resetBox = [gameRec[0]+textXoff, gameRec[1]+gameRec[3]-textH, textW, textH]
 
         menuBox = [gameRec[0]+gameRec[2]-textXoff*2-textW, gameRec[1]+gameRec[3]-textH, textW, textH]
         shadowText(menuBox[0], menuBox[1]+menuBox[3], "MENU", menuBox[3], "black")
@@ -189,15 +195,21 @@ const mainLoop = function(){
         ctx.textAlign = "center"
         ctx.textBaseline = 'middle'
         if(verticalOrien){
-            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "black")
-            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "white")
-            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typeOfGoalNum].toString(), textH*0.75, "black")
-            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typeOfGoalNum].toString(), textH*0.75, "white")
+            shadowText(gameCent[0]+textH*4, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "black")
+            fillText(gameCent[0]+textH*4, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "white")
+            shadowText(gameCent[0]+textH*4, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typeOfGoalNum].toString(), textH*0.75, "black")
+            fillText(gameCent[0]+textH*4, gameRec[3]/10+gameRec[1]+textH, score[difficulty*typesOfGoals.length + typeOfGoalNum].toString(), textH*0.75, "white")
 
-            shadowText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "black")
-            fillText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "white")
-            shadowText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1]+textH, currentGoal, textH*0.75, "black")
-            fillText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1]+textH, currentGoal, textH*0.75, "white")
+            shadowText(gameCent[0], gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "black")
+            fillText(gameCent[0], gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "white")
+            shadowText(gameCent[0], gameRec[3]/10+gameRec[1]+textH, currentGoal, textH*0.75, "black")
+            fillText(gameCent[0], gameRec[3]/10+gameRec[1]+textH, currentGoal, textH*0.75, "white")
+
+            shadowText(gameCent[0]-textH*4, gameRec[3]/10+gameRec[1], difficulties[difficulty], textH*0.75, "black")
+            fillText(gameCent[0]-textH*4, gameRec[3]/10+gameRec[1], difficulties[difficulty], textH*0.75, "white")
+            shadowText(gameCent[0]-textH*4, gameRec[3]/10+gameRec[1]+textH, typeOfGoal.toUpperCase(), textH*0.75, "black")
+            fillText(gameCent[0]-textH*4, gameRec[3]/10+gameRec[1]+textH, typeOfGoal.toUpperCase(), textH*0.75, "white")
+
         }else{
             shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*3, "SCORE", textH*0.75, "black")
             fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*3, "SCORE", textH*0.75, "white")
@@ -208,6 +220,11 @@ const mainLoop = function(){
             fillText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, "GOAL", textH*0.75, "white")
             shadowText(gameRec[2]/10+gameRec[0], gameCent[1]+textH*2, currentGoal, textH*0.75, "black")
             fillText(gameRec[2]/10+gameRec[0], gameCent[1]+textH*2, currentGoal, textH*0.75, "white")
+
+            shadowText(-gameRec[2]/10+gameRec[0]+gameRec[2], gameCent[1]-textH*3, difficulties[difficulty], textH*0.75, "black")
+            fillText(-gameRec[2]/10+gameRec[0]+gameRec[2], gameCent[1]-textH*3, difficulties[difficulty], textH*0.75, "white")
+            shadowText(-gameRec[2]/10+gameRec[0]+gameRec[2], gameCent[1]-textH*2, typeOfGoal.toUpperCase(), textH*0.75, "black")
+            fillText(-gameRec[2]/10+gameRec[0]+gameRec[2], gameCent[1]-textH*2, typeOfGoal.toUpperCase(), textH*0.75, "white")
         }
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
@@ -252,7 +269,16 @@ const mainLoop = function(){
 
     if((!soundPlayed)&&(audioAllowed)){
         
-        
+        if(chain.length == 0){
+            if(justScored){
+                pop_high.play();
+                justScored = false;
+            }else{
+                pop_low.play();
+            }
+        }else{
+            pop_mid.play();
+        }
         // if(winner||wonThis){
         //     pop_high.play()
         // }else if(noMovesLeft){
@@ -403,7 +429,11 @@ const getValFromText = function(text){
 
 const checkRelease = function(){
     if(gameActive){
+        if(chain.length > 0){
+            soundPlayed = false
+        }
         if(formVal == currentGoal){
+            justScored = true
             console.log('match made')
             score[difficulty*typesOfGoals.length + typeOfGoalNum]++
 
