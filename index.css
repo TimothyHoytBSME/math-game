@@ -55,33 +55,14 @@ input#un-mute:checked ~ .mute img {
 
 #themenu{
     position: absolute;
-    width: 50%;
-    height: 50%;
-    top: 25%;
-    left: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
     visibility: hidden;
     /* background-color: rgb(64, 64, 64); */
-}
-
-#difficulty, #gametype{
-    font-size: 4vw;
-    position: absolute;
-    width: 75%;
-    height: 15%;
-    left: 12.5%;
-
-}
-
-#difficulty{
-    top: 25%;
-}
-
-#gametype{
-    top: 45%
-}
-
-option{
-    font-size: 4vw;
-    text-align: center;
-    
 }

@@ -250,13 +250,13 @@ const mainLoop = function(){
         fillText(returnBox[0], returnBox[1]+returnBox[3], "RETURN", returnBox[3], "white")
 
         ctx.textAlign = 'center'
-        var message1 = "INSTRUCTIONS HERE"
-        shadowText(gameCent[0], gameCent[1], message1, textH, "black")
-        fillText(gameCent[0], gameCent[1], message1, textH, "white")
+        var message1 = "Link squares to".toUpperCase()
+        shadowText(gameCent[0], gameCent[1]-gameRec[3]/3, message1, textH, "black")
+        fillText(gameCent[0], gameCent[1]-gameRec[3]/3, message1, textH, "white")
 
-        var message2 = "INSTRUCTIONS LINE 2"
-        shadowText(gameCent[0], gameCent[1]+textH, message2, textH, "black")
-        fillText(gameCent[0], gameCent[1]+textH, message2, textH, "white")
+        var message2 = "equal the goal".toUpperCase()
+        shadowText(gameCent[0], gameCent[1]+textH-gameRec[3]/3, message2, textH, "black")
+        fillText(gameCent[0], gameCent[1]+textH-gameRec[3]/3, message2, textH, "white")
         ctx.textAlign = 'left'
     }
 

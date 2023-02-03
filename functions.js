@@ -324,6 +324,34 @@ const sizeCanvas = function(){
         muteimages[1].style.left = (mileft).toString()+"px";
     }
 
+
+    if(verticalOrien){
+        difficultyDiv.style.height = (gameRec[3]/15/dvp).toString() + "px"
+        gametypeDiv.style.height = (gameRec[3]/15/dvp).toString() + "px"
+        difficultyDiv.style.width = (gameRec[2]/1.8/dvp).toString() + "px"
+        gametypeDiv.style.width = (gameRec[2]/1.8/dvp).toString() + "px"
+
+        difficultyDiv.style.margin = (gameRec[3]/70/dvp).toString() + "px"
+        gametypeDiv.style.margin = (gameRec[3]/70/dvp).toString() + "px"
+
+        difficultyDiv.style.fontSize = (gameRec[2]/30/dvp).toString() + "px"
+        gametypeDiv.style.fontSize = (gameRec[2]/30/dvp).toString() + "px"
+
+    }else{
+        difficultyDiv.style.height = (gameRec[3]/10/dvp).toString() + "px"
+        gametypeDiv.style.height = (gameRec[3]/10/dvp).toString() + "px"
+        difficultyDiv.style.width = (gameRec[2]/3/dvp).toString() + "px"
+        gametypeDiv.style.width = (gameRec[2]/3/dvp).toString() + "px"
+
+        difficultyDiv.style.margin = (gameRec[2]/60/dvp).toString() + "px"
+        gametypeDiv.style.margin = (gameRec[2]/60/dvp).toString() + "px"
+
+        difficultyDiv.style.fontSize = (gameRec[2]/50/dvp).toString() + "px"
+        gametypeDiv.style.fontSize = (gameRec[2]/50/dvp).toString() + "px"
+    }
+    
+
+    
 }
 
 
