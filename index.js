@@ -19,7 +19,6 @@ var newBox = []
 // var resetBox = []
 var menuBox = []
 var returnBox = []
-var score = 0;
 // var wonThis = false;
 var gameActive = true;
 // var isColorMode = true;
@@ -36,6 +35,13 @@ var formVal = "??";
 const precision = 4;
 var textH = 10
 var currentGoal = "99999999.99";
+var difficulty = 1 //must be integer between 0 and 2 (easy, challenge, impossible)
+var difficulties = ["EASY","CHALLENGE","IMPOSSIBLE"]
+var typeOfGoal = "decimal" // or "decimal" or "integer"
+var score = [0,0,0]; //EASY,CHALLENGE,IMPOSSIBLE
+var calculatingGoal = false;
+
+
 
 //Main Animation Loop
 const mainLoop = function(){
@@ -232,18 +238,23 @@ const mainLoop = function(){
         if(verticalOrien){
             shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "black")
             fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "white")
-            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score.toString(), textH*0.75, "black")
-            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score.toString(), textH*0.75, "white")
+            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty].toString(), textH*0.75, "black")
+            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score[difficulty].toString(), textH*0.75, "white")
 
             shadowText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "black")
             fillText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "white")
             shadowText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1]+textH, currentGoal, textH*0.75, "black")
             fillText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1]+textH, currentGoal, textH*0.75, "white")
         }else{
-            shadowText(gameRec[2]/10+gameRec[0], gameCent[1], "SCORE", textH*0.75, "black")
-            fillText(gameRec[2]/10+gameRec[0], gameCent[1], "SCORE", textH*0.75, "white")
-            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, score.toString(), textH*0.75, "black")
-            fillText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, score.toString(), textH*0.75, "white")
+            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*3, "SCORE", textH*0.75, "black")
+            fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*3, "SCORE", textH*0.75, "white")
+            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty].toString(), textH*0.75, "black")
+            fillText(gameRec[2]/10+gameRec[0], gameCent[1]-textH*2, score[difficulty].toString(), textH*0.75, "white")
+
+            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, "GOAL", textH*0.75, "black")
+            fillText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, "GOAL", textH*0.75, "white")
+            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]+textH*2, currentGoal, textH*0.75, "black")
+            fillText(gameRec[2]/10+gameRec[0], gameCent[1]+textH*2, currentGoal, textH*0.75, "white")
         }
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
@@ -262,6 +273,7 @@ const mainLoop = function(){
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
         
+
         
         // if(noMovesLeft&&(!winner)&&(!wonThis)){
         //     const wid = Math.min(gameRec[2],gameRec[3])/2
@@ -278,7 +290,7 @@ const mainLoop = function(){
         //     fillRec([gameCent[0]-wid/2,gameCent[1]-wid/2,wid,wid],colText(backColor))
         //     if(!wonThis){
         //         wonThis = true;
-        //         score++
+        //         score[difficulty]++
         //         saveGame()
         //     }
         //     ctx.textBaseline = 'middle'
@@ -375,7 +387,7 @@ const getValFromFormula = function(theFormula){
     }
 
     var formcopy = theFormula
-    console.log('theFormula',formcopy)
+    // console.log('theFormula',formcopy)
     for(var i=0; i<parCount; i++){
         var inside = ""
         const start = parCount-i
@@ -396,7 +408,7 @@ const getValFromFormula = function(theFormula){
     
     // console.log('attempting to calc', formcopy)
     const finalVal = getValFromText(formcopy).toString()
-    console.log("FINALVAL",finalVal)
+    // console.log("FINALVAL",finalVal)
     if(!(finalVal == "??")){
         return parseFloat(parseFloat(finalVal).toFixed(precision)).toString()
     }
@@ -482,7 +494,50 @@ const getValFromText = function(text){
 
 const checkRelease = function(){
     if(gameActive){
-        //TODO release action (compare to goal, etc.)
+        if(formVal == currentGoal){
+            console.log('match made')
+            score[difficulty]++
+            ///////////todo delete and replace tile values:
+
+            //if chain count is even, remove last (ends in op)
+            if(isEven(chain.length)){
+                // console.log('chain was even')
+                chain.pop()
+                // console.log('trimmed chain',chain)
+            }
+
+            //calc num ops (chain length -1)/2
+            const numOps = (chain.length-1)/2
+            // console.log('numOps',numOps)
+
+            //pick same number of random tiles of chain to be ops, replace vals
+            var changed = new Array(chain.length).fill(false)
+            for(var i=0; i<numOps; i++){
+                found = false;
+                while(!found){
+                    var randI = floor(random()*chain.length)
+                    if(!changed[randI]){
+                        var point = [...chain[randI]]
+                        var newOp = ops[floor(random()*ops.length)]
+                        gameGrid[point[0]][point[1]].value = newOp
+                        changed[randI] = true
+                        found = true
+                    }
+                }
+            }
+
+            //replace remaining with random numbers
+            for(var i=0; i<chain.length;i++){
+                if(!changed[i]){
+                    var point =[...chain[i]]
+                    gameGrid[point[0]][point[1]].value = floor(random()*8+1)
+                    changed[i]=true
+                }
+            }
+
+            //generate new goal
+            genGoal()
+        }
         selected = [-1,-1]
         target = [-1,-1]
         chain = []
@@ -571,10 +626,10 @@ const genGrid = function(){
 
     console.log('generating new grid')
     gameGrid = []
+    score[difficulty] = 0;
     const tot = gridDims[0]*gridDims[1]
     const opRatio = 0.3
-    const opMin = 0.9*opRatio*tot
-    const opMax = 1.1*opRatio*tot
+    const opNum = 8
     var opCount = 0
     const ranGrid = function(){
         for(var i=0; i<gridDims[0]; i++){
@@ -602,14 +657,33 @@ const genGrid = function(){
             }
             gameGrid.push(row)
         }
-        console.log('opCount',opCount)
-        if(((opCount)<opMin)||((opCount)>opMax)){
-            console.log('opMin', opMin, 'opMax', opMax)
-            console.log('ratio out of range, redoing')
+        // console.log('opCount',opCount)
+        if(opCount != opNum){
+            // console.log('opMin', opMin, 'opMax', opMax)
+            console.log('Number of operators no good, redoing grid')
             opCount = 0;
             gameGrid = []
             ranGrid()
         }
+
+        //todo if no division & typeofgoal is decimal
+        if(typeOfGoal=="decimal"){
+            var hasDivision = false
+            for(var i=0; i<gridDims[0]; i++){
+                for(var j=0; j<gridDims[1]; j++){
+                    if(gameGrid[i][j].value == "÷"){
+                        hasDivision = true
+                    }
+                }
+            }
+            if(!hasDivision){
+                console.warn('No division found')
+                opCount = 0;
+                gameGrid = []
+                ranGrid()
+            }
+        }
+        
     }
 
     ranGrid()
@@ -618,67 +692,182 @@ const genGrid = function(){
 
     //todo generate goal
 
-    const genGoal = function(){
-        const minTiles = 5  //needs to be odd, and at least 3
-        var thisChain = []
-
-        //find start tile (must be number)
-        var startP = []
-        var foundStart = false
-        while(!foundStart){
-            startP = [floor(random()*gridDims[0]),floor(random()*gridDims[1])]
-            if(!isNaN(parseInt(gameGrid[startP[0]][startP[1]].value))){
-                foundStart = true
-            }else{
-                console.log('finding new start')
-            }
-        }
-        thisChain.push(startP)
-        console.log('startFound',startP, gameGrid[startP[0]][startP[1]].value)
-        
-        while(thisChain.length < minTiles){
-            //find next op/number pair
-            var nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
-            if((!includesPoint(thisChain,nextPoint))&&(isNaN(gameGrid[nextPoint[0]][nextPoint[1]].value))){
-                //unused operator found
-                thisChain.push(nextPoint)
-            }else{
-                //failed, restart
-                genGoal()
-                return
-            }
-
-            //todo fail if start was 1 and this op is mult or div
-
-
-            nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
-            if((!includesPoint(thisChain,nextPoint))&&(!isNaN(gameGrid[nextPoint[0]][nextPoint[1]].value))){
-                //unused number found
-                thisChain.push(nextPoint)
-            }else{
-                //failed, restart
-                genGoal()
-                return
-            }
-
-            //todo fail if this op is mult or div and this num is 1
-        }
-        
-        console.log('goalChainBuilt',thisChain)
-
-        const goalForm = makeFormula(thisChain)
-        console.log('goalFormula',goalForm)
-
-        const theVal = getValFromFormula(goalForm)
-        console.log('goalVal',theVal)
-
-        currentGoal = theVal
-    }
+    
 
     genGoal()
 
 
     saveGame()
+}
+
+var goalAttempts = 0;
+const maxGoalAttempts = 10;
+
+const genGoal = function(){
+    goalAttempts++
+
+    if(goalAttempts > maxGoalAttempts){
+        goalAttempts = 0
+        console.error('MAX GOAL ATTEMPTS REACHED, NEW GRID')
+        genGrid()
+    }
+
+    const wid = Math.min(gameRec[2],gameRec[3])/2
+    fillRec([gameCent[0]-wid/2,gameCent[1]-wid/2,wid,wid],colText(backColor))
+
+    const minTiles = 3+difficulty*2  //needs to be odd, and at least 3
+    var thisChain = []
+
+    //find start tile (must be number)
+    var startP = []
+    var foundStart = false
+    while(!foundStart){
+        startP = [floor(random()*gridDims[0]),floor(random()*gridDims[1])]
+        if(!isNaN(parseInt(gameGrid[startP[0]][startP[1]].value))){
+            foundStart = true
+        }else{
+            // console.log('finding new start')
+        }
+    }
+    thisChain.push(startP)
+    // console.log('startFound',startP, gameGrid[startP[0]][startP[1]].value)
+    
+    while(thisChain.length < minTiles){
+        //find next op/number pair
+
+        //if operator not possible fail
+        var choices = [
+            [thisChain[thisChain.length-1][0],thisChain[thisChain.length-1][1]+1],
+            [thisChain[thisChain.length-1][0],thisChain[thisChain.length-1][1]-1],
+            [thisChain[thisChain.length-1][0]-1,thisChain[thisChain.length-1][1]-1],
+            [thisChain[thisChain.length-1][0]-1,thisChain[thisChain.length-1][1]],
+            [thisChain[thisChain.length-1][0]-1,thisChain[thisChain.length-1][1]+1],
+            [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]-1],
+            [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]],
+            [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]+1]
+        ]
+        // console.log('choices',choices)
+
+        var opAvail = false;
+        for (var i = 0; i<choices.length; i++){
+            var p = [...choices[i]]
+            var pisvalid = (p[0]>-1)? (p[1]>-1)? (p[0]<gridDims[0])? (p[1]<gridDims[1])? true : false : false : false : false
+            // console.log("p is valid", p)
+            if(!(includesPoint(thisChain,p))&&pisvalid){
+                // console.log('p',p)
+                var v = gameGrid[p[0]][p[1]].value
+                // console.log('valtocheck', v)
+                if((v==ops[0])||(v==ops[1])||(v==ops[2])||(v==ops[3])){
+                    //is an available op
+                    // console.log('OP AVAILABLE')
+                    opAvail = true
+                }
+            }
+        }
+
+        if(!opAvail){
+            //failed, restart
+            console.log('failed to make goal, noOp dead end, retrying')
+            genGoal()
+            return
+        }
+
+        var nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
+        while(!((!includesPoint(thisChain,nextPoint))&&(isNaN(parseInt(gameGrid[nextPoint[0]][nextPoint[1]].value))))){
+            nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
+        }
+
+        thisChain.push(nextPoint)
+        // console.warn('OPFOUND')
+        
+
+
+        //todo fail if start was 1 and this op is mult or div
+
+        
+
+        //todo fail if no number available, instead of random pick not number
+         //if number not possible fail
+        choices = [
+            [thisChain[thisChain.length-1][0],thisChain[thisChain.length-1][1]+1],
+            [thisChain[thisChain.length-1][0],thisChain[thisChain.length-1][1]-1],
+            [thisChain[thisChain.length-1][0]-1,thisChain[thisChain.length-1][1]-1],
+            [thisChain[thisChain.length-1][0]-1,thisChain[thisChain.length-1][1]],
+            [thisChain[thisChain.length-1][0]-1,thisChain[thisChain.length-1][1]+1],
+            [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]-1],
+            [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]],
+            [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]+1]
+        ]
+        // console.log('choices',choices)
+
+        var numAvail = false;
+        for (var i = 0; i<choices.length; i++){
+            var p = [...choices[i]]
+            var pisvalid = (p[0]>-1)? (p[1]>-1)? (p[0]<gridDims[0])? (p[1]<gridDims[1])? true : false : false : false : false
+            // console.log("p is valid", p)
+            if(!(includesPoint(thisChain,p))&&pisvalid){
+                // console.log('p',p)
+                var v = gameGrid[p[0]][p[1]].value
+                // console.log('valtocheck', v)
+                if(!isNaN(parseInt(v))){
+                    //is an available op
+                    // console.log('num AVAILABLE')
+                    numAvail = true
+                }
+            }
+        }
+
+        if(!numAvail){
+            //failed, restart
+            console.log('failed to make goal, noNum dead end, retrying')
+            genGoal()
+            return
+        }
+
+        var nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
+        while(!((!includesPoint(thisChain,nextPoint))&&(!isNaN(parseInt(gameGrid[nextPoint[0]][nextPoint[1]].value))))){
+            nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
+        }
+
+        thisChain.push(nextPoint)
+        // console.warn('NUMFOUND')
+
+        //todo fail if this op is mult or div and this num is 1
+    }
+    
+    // console.log('goalChainBuilt',thisChain)
+
+    const goalForm = makeFormula(thisChain)
+
+    const theVal = getValFromFormula(goalForm)
+
+    //todo fail if not obide by typOfGoal ("both", "decimal", "integer")
+    
+
+    if(!(typeOfGoal == "both")){
+        if(isInt(parseFloat(theVal))){
+            if(typeOfGoal == "decimal"){
+                //failed, restart
+                console.error('failed to make goal, not decimal, retrying')
+                genGoal()
+                return
+            }
+        }else{
+            if(typeOfGoal == "integer"){
+                //failed, restart
+                console.error('failed to make goal, not integer, retrying')
+                genGoal()
+                return
+            }
+        }
+    }
+    
+
+    currentGoal = theVal
+    console.log('goalFormula',goalForm)
+    console.log('goalVal',theVal)
+
+
 }
 
 const getRandomNeighbor = function(point){

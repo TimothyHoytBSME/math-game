@@ -31,6 +31,10 @@ const avg = function(a,b){
     return (a+b)/2
 }
 
+function isInt(n) {
+    return n % 1 === 0;
+ }
+ 
 const arrEq = function(a,b){ 
     const as = a.length
     const bs = b.length
