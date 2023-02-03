@@ -4,13 +4,26 @@
 
 //primary elements
 const canvas = document.createElement('canvas');
-const maindiv = document.getElementsByTagName('main')[0]
-maindiv.appendChild(canvas)
+const mainDiv = document.getElementsByTagName('main')[0]
+mainDiv.appendChild(canvas)
 const ctx = canvas.getContext("2d");
+const theMenuDiv = document.getElementById('themenu')
+const difficultyDiv = document.getElementById('difficulty')
+const gametypeDiv = document.getElementById('gametype')
 
+difficultyDiv.onchange = ()=>{  
+    difficulty = difficultyDiv.selectedIndex
+    //todo load grid for each difficulty or gen new, keep score for each combo
+    genGrid()
+}
 
-
-
+gametypeDiv.onchange = ()=>{
+    var ind = gametypeDiv.selectedIndex
+    typeOfGoal = typesOfGoals[ind]
+    console.log("game type changed", typeOfGoal)
+    //todo load grid for each difficulty or gen new, keep score for each combo
+    genGrid();
+}
 //universal constants
 
 const startTime = new Date();

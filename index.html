@@ -16,6 +16,23 @@
 
   <script src="preload.js"></script>
   <main>
+
+    <div id = "themenu">
+      <!-- <label for="diffuculty">DIFFICULTY</label> -->
+      <select name="difficulty" id="difficulty">
+        <option value="EASY" selected >EASY</option>
+        <option value="CHALLENGE">CHALLENGING</option>
+        <option value="IMPOSSIBLE" >IMPOSSIBLE</option>
+      </select>
+
+      <!-- <label for="gametype">GAME TYPE</label> -->
+      <select name="gametype" id="gametype">
+        <option value="INTEGER">INTEGER</option>
+        <option value="BOTH">BOTH</option>
+        <option value="DECIMAL" selected>DECIMAL</option>
+      </select>
+    </div>
+
     <input type="checkbox" name="un-mute" id="un-mute">
     <label for="un-mute" class="mute mutelabel">
         <img class = "muteimage" src="http://upload.wikimedia.org/wikipedia/commons/3/3f/Mute_Icon.svg" alt="Mute_Icon.svg" title="Mute icon">

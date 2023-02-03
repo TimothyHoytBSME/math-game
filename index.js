@@ -37,8 +37,9 @@ var textH = 10
 var currentGoal = "99999999.99";
 var difficulty = 1 //must be integer between 0 and 2 (easy, challenge, impossible)
 var difficulties = ["EASY","CHALLENGE","IMPOSSIBLE"]
+var typesOfGoals = ["integer", "both", "decimal"]
 var typeOfGoal = "decimal" // or "decimal" or "integer"
-var score = [0,0,0]; //EASY,CHALLENGE,IMPOSSIBLE
+var score = [0,0,0,0,0,0,0]; //EASY(int,both,dec),CHALLENGE(int,both,dec),IMPOSSIBLE(int,both,dec)
 var calculatingGoal = false;
 
 
@@ -510,6 +511,18 @@ const checkRelease = function(){
             const numOps = (chain.length-1)/2
             // console.log('numOps',numOps)
 
+            //TODO if typeofgoal is decimal, there was a division symbol, there must be one in new tiles
+            var hadDiv = false;
+            for(var i=0; i<chain.length; i++){
+                if(gameGrid[chain[i][0]][chain[i][1]].value == "÷"){
+                    hadDiv = true
+                }
+            }
+            var divPlaced = true
+            if(typeOfGoal == "decimal"){
+                divPlaced = false
+            }
+
             //pick same number of random tiles of chain to be ops, replace vals
             var changed = new Array(chain.length).fill(false)
             for(var i=0; i<numOps; i++){
@@ -519,6 +532,10 @@ const checkRelease = function(){
                     if(!changed[randI]){
                         var point = [...chain[randI]]
                         var newOp = ops[floor(random()*ops.length)]
+                        if(!divPlaced){
+                            newOp = "÷"
+                            divPlaced = true
+                        }
                         gameGrid[point[0]][point[1]].value = newOp
                         changed[randI] = true
                         found = true
@@ -593,6 +610,7 @@ const click = function(){
         if((mdX > (menuBox[0]))&&(mdY > menuBox[1])&&(mdX < (menuBox[0]+menuBox[2]))&&(mdY<(menuBox[1]+menuBox[3]))){
             console.log("menu clicked")
             gameActive = false;
+            theMenuDiv.style.visibility = "visible"
         }
 
         var wid = 0;
@@ -617,6 +635,7 @@ const click = function(){
     }else{
         if((mdX > (returnBox[0]))&(mdY > returnBox[1])&&(mdX < (returnBox[0]+returnBox[2]))&&(mdY<(returnBox[1]+returnBox[3]))){
             console.log("return clicked")
+            theMenuDiv.style.visibility = "hidden"
             gameActive = true;
         }
     }
@@ -649,9 +668,7 @@ const genGrid = function(){
                     piece.value = ops[floor(random()*4)]
                     piece.type = "operator"
                     opCount++
-                    
                 }   
-
 
                 row.push(piece)
             }

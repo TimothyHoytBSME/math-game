@@ -19,7 +19,6 @@ main {
     width: 100%;
     background-color: rgb(64, 64, 64);
 }
-
 audio{
     display: none
 }
@@ -51,4 +50,38 @@ input#un-mute:checked ~ .mute img {
     width: 200px;
     position: absolute;
     filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(180deg) brightness(11118%) contrast(119%) drop-shadow(0px 0px var(--sspx) rgb(0, 0, 0));
+}
+
+
+#themenu{
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    top: 25%;
+    left: 25%;
+    visibility: hidden;
+    /* background-color: rgb(64, 64, 64); */
+}
+
+#difficulty, #gametype{
+    font-size: 4vw;
+    position: absolute;
+    width: 75%;
+    height: 15%;
+    left: 12.5%;
+
+}
+
+#difficulty{
+    top: 25%;
+}
+
+#gametype{
+    top: 45%
+}
+
+option{
+    font-size: 4vw;
+    text-align: center;
+    
 }
