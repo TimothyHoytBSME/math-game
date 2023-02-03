@@ -581,16 +581,16 @@ const genGrid = function(){
         }
 
         if(typeOfGoal=="decimal"){
-            var hasDivision = false
+            divisionCount = 0;
             for(var i=0; i<gridDims[0]; i++){
                 for(var j=0; j<gridDims[1]; j++){
                     if(gameGrid[i][j].value == "÷"){
-                        hasDivision = true
+                        divisionCount++
                     }
                 }
             }
-            if(!hasDivision){
-                console.warn('No division found')
+            if(divisionCount < 2){
+                console.warn('Not enough division operators')
                 opCount = 0;
                 gameGrid = []
                 ranGrid()
@@ -669,8 +669,20 @@ const genGoal = function(){
         }
 
         var nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
-        while(!((!includesPoint(thisChain,nextPoint))&&(isNaN(parseInt(gameGrid[nextPoint[0]][nextPoint[1]].value))))){
+        var opVal = gameGrid[nextPoint[0]][nextPoint[1]].value
+        while(!((!includesPoint(thisChain,nextPoint))&&(isNaN(parseInt(opVal))))){
             nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
+            opVal = gameGrid[nextPoint[0]][nextPoint[1]].value
+        }
+
+        if((opVal == ops[1])||(opVal == ops[3])){
+            //is division or mult
+            if(parseInt(gameGrid[thisChain[thisChain.length-1][0]][thisChain[thisChain.length-1][1]].value) == 1){
+                //mult or division by 1 fail
+                console.log('failed to make goal, div or mul by 1, retrying')
+                genGoal()
+                return
+            }
         }
 
         thisChain.push(nextPoint)
@@ -705,8 +717,20 @@ const genGoal = function(){
         }
 
         var nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
-        while(!((!includesPoint(thisChain,nextPoint))&&(!isNaN(parseInt(gameGrid[nextPoint[0]][nextPoint[1]].value))))){
+        var numVal = gameGrid[nextPoint[0]][nextPoint[1]].value
+        while(!((!includesPoint(thisChain,nextPoint))&&(!isNaN(parseInt(numVal))))){
             nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
+            numVal = gameGrid[nextPoint[0]][nextPoint[1]].value
+        }
+
+        if((opVal == ops[1])||(opVal == ops[3])){
+            //is division or mult
+            if(parseInt(numVal) == 1){
+                //mult or division by 1 fail
+                console.log('failed to make goal, div or mul by 1, retrying')
+                genGoal()
+                return
+            }
         }
 
         thisChain.push(nextPoint)

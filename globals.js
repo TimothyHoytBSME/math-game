@@ -26,7 +26,7 @@ gametypeDiv.onchange = ()=>{
     typeOfGoal = typesOfGoals[ind]
     typeOfGoalNum = ind
     console.log("game type changed", typeOfGoal)
-    if(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]){
+    if(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum][0]){
         gameGrid = JSON.parse(JSON.stringify(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]))
         currentGoal = goals[difficulty*typesOfGoals.length + typeOfGoalNum]
     }else{
