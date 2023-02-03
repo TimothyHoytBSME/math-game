@@ -309,7 +309,7 @@ const sizeCanvas = function(){
         }
         var miwid = gameRec[2]/20/dvp
         var mitop = wHeight/2 - miwid/2
-        var mileft = gameRec[2]*17/20/dvp + gameRec[0]/dvp
+        var mileft = gameRec[2]*18/20/dvp + gameRec[0]/dvp
         muteimages[0].style.width = (miwid).toString()+"px"
         muteimages[1].style.width = (miwid).toString()+"px"
         muteimages[0].style.height = (miwid).toString()+"px"

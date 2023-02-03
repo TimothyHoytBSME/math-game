@@ -9,14 +9,14 @@ var pieceSize = 1;
 var textW = 1;
 // var newColor = [0,0,0]
 var backColor = [20,20,20];
-var gridHistory = []
+// var gridHistory = []
 var gameCent = []
 var gameGrid = []
 var gridDims = [6,5]
 // var solution = []
-var undoBox = []
+// var undoBox = []
 var newBox = []
-var resetBox = []
+// var resetBox = []
 var menuBox = []
 var returnBox = []
 var score = 0;
@@ -35,6 +35,7 @@ var formula = "??"
 var formVal = "??";
 const precision = 4;
 var textH = 10
+var currentGoal = "99999999.99";
 
 //Main Animation Loop
 const mainLoop = function(){
@@ -89,7 +90,7 @@ const mainLoop = function(){
                 
 
                 // console.log('drawing piece', piece)
-                var pieceColor = isInChain? [123,123,0] : piece.color
+                var pieceColor = isInChain? (formVal == currentGoal)? [0,123,0] : [123,123,0] : piece.color
                 fillRec([ pieceLeft, pieceTop, pieceSize, pieceSize], colText(pieceColor))
 
 
@@ -211,16 +212,16 @@ const mainLoop = function(){
 
     if(gameActive){
         undoBox = [gameRec[0]+textXoff, gameRec[1]+textYoff, textW, textH]
-        shadowText(undoBox[0], undoBox[1]+undoBox[3], "UNDO", undoBox[3], "black")
-        fillText(undoBox[0], undoBox[1]+undoBox[3], "UNDO", undoBox[3], "white")
+        // shadowText(undoBox[0], undoBox[1]+undoBox[3], "UNDO", undoBox[3], "black")
+        // fillText(undoBox[0], undoBox[1]+undoBox[3], "UNDO", undoBox[3], "white")
         
         newBox = [gameRec[0]+gameRec[2]-textW, gameRec[1]+textYoff, textW*0.75, textH]
         shadowText(newBox[0], newBox[1]+newBox[3], "NEW", newBox[3], "black")
         fillText(newBox[0], newBox[1]+newBox[3], "NEW", newBox[3], "white")
 
         resetBox = [gameRec[0]+textXoff, gameRec[1]+gameRec[3]-textH, textW, textH]
-        shadowText(resetBox[0], resetBox[1]+resetBox[3], "RESET", resetBox[3], "black")
-        fillText(resetBox[0], resetBox[1]+resetBox[3], "RESET", resetBox[3], "white")
+        // shadowText(resetBox[0], resetBox[1]+resetBox[3], "RESET", resetBox[3], "black")
+        // fillText(resetBox[0], resetBox[1]+resetBox[3], "RESET", resetBox[3], "white")
 
         menuBox = [gameRec[0]+gameRec[2]-textXoff*2-textW, gameRec[1]+gameRec[3]-textH, textW, textH]
         shadowText(menuBox[0], menuBox[1]+menuBox[3], "MENU", menuBox[3], "black")
@@ -229,12 +230,20 @@ const mainLoop = function(){
         ctx.textAlign = "center"
         ctx.textBaseline = 'middle'
         if(verticalOrien){
-            shadowText(gameCent[0], gameRec[3]/8+gameRec[1], score.toString(), "black")
-            fillText(gameCent[0], gameRec[3]/8+gameRec[1], score.toString(), "white")
-            
+            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "black")
+            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1], "SCORE", textH*0.75, "white")
+            shadowText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score.toString(), textH*0.75, "black")
+            fillText(gameCent[0]+textH*3, gameRec[3]/10+gameRec[1]+textH, score.toString(), textH*0.75, "white")
+
+            shadowText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "black")
+            fillText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1], "GOAL", textH*0.75, "white")
+            shadowText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1]+textH, currentGoal, textH*0.75, "black")
+            fillText(gameCent[0]-textH*3, gameRec[3]/10+gameRec[1]+textH, currentGoal, textH*0.75, "white")
         }else{
-            shadowText(gameRec[2]/8+gameRec[0], gameCent[1], score.toString(), "black")
-            fillText(gameRec[2]/8+gameRec[0], gameCent[1], score.toString(), "white")
+            shadowText(gameRec[2]/10+gameRec[0], gameCent[1], "SCORE", textH*0.75, "black")
+            fillText(gameRec[2]/10+gameRec[0], gameCent[1], "SCORE", textH*0.75, "white")
+            shadowText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, score.toString(), textH*0.75, "black")
+            fillText(gameRec[2]/10+gameRec[0], gameCent[1]+textH, score.toString(), textH*0.75, "white")
         }
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
@@ -243,8 +252,8 @@ const mainLoop = function(){
         ctx.textAlign = "center"
         ctx.textBaseline = 'middle'
         if(verticalOrien){
-            shadowText(gameCent[0], gameRec[3]*0.9+gameRec[1], valtodisp,textH*0.75, "black")
-            fillText(gameCent[0], gameRec[3]*0.9+gameRec[1], valtodisp,textH*0.75, "white")
+            shadowText(gameCent[0], gameRec[3]*0.9+gameRec[1]-textH*0.5, valtodisp,textH*0.75, "black")
+            fillText(gameCent[0], gameRec[3]*0.9+gameRec[1]-textH*0.5, valtodisp,textH*0.75, "white")
             
         }else{
             shadowText(gameCent[0], gameRec[3]*0.95+gameRec[1], valtodisp,textH*0.75, "black")
@@ -505,26 +514,26 @@ const click = function(){
     if(gameActive){
 
 
-        if((mdX > (undoBox[0]))&&(mdY > undoBox[1])&&(mdX < (undoBox[0]+undoBox[2]))&&(mdY<(undoBox[1]+undoBox[3]))&&(!wonThis)){
-            console.log("undo clicked")
-            if(gridHistory.length > 0){
-                gameGrid = []
-                const prevGrid = JSON.parse(JSON.stringify(gridHistory[gridHistory.length-1]))
-                gameGrid = JSON.parse(JSON.stringify(prevGrid));
-                gridHistory.pop()
-                saveGame()
-            }
-        }
+        // if((mdX > (undoBox[0]))&&(mdY > undoBox[1])&&(mdX < (undoBox[0]+undoBox[2]))&&(mdY<(undoBox[1]+undoBox[3]))&&(!wonThis)){
+        //     console.log("undo clicked")
+        //     if(gridHistory.length > 0){
+        //         gameGrid = []
+        //         const prevGrid = JSON.parse(JSON.stringify(gridHistory[gridHistory.length-1]))
+        //         gameGrid = JSON.parse(JSON.stringify(prevGrid));
+        //         gridHistory.pop()
+        //         saveGame()
+        //     }
+        // }
 
         if((mdX > (newBox[0]))&&(mdY > newBox[1])&&(mdX < (newBox[0]+newBox[2]))&&(mdY<(newBox[1]+newBox[3]))){
             console.log("new clicked")
             doNew()
         }
 
-        if((mdX > (resetBox[0]))&&(mdY > resetBox[1])&&(mdX < (resetBox[0]+resetBox[2]))&&(mdY<(resetBox[1]+resetBox[3]))&&(!wonThis)){
-            console.log("reset clicked")
-            doReset()
-        }
+        // if((mdX > (resetBox[0]))&&(mdY > resetBox[1])&&(mdX < (resetBox[0]+resetBox[2]))&&(mdY<(resetBox[1]+resetBox[3]))&&(!wonThis)){
+        //     console.log("reset clicked")
+        //     doReset()
+        // }
 
         if((mdX > (menuBox[0]))&&(mdY > menuBox[1])&&(mdX < (menuBox[0]+menuBox[2]))&&(mdY<(menuBox[1]+menuBox[3]))){
             console.log("menu clicked")
@@ -663,6 +672,7 @@ const genGrid = function(){
         const theVal = getValFromFormula(goalForm)
         console.log('goalVal',theVal)
 
+        currentGoal = theVal
     }
 
     genGoal()
@@ -705,7 +715,7 @@ const saveGame = function(){
     const gameObj = {
         "gameGrid": gameGrid,
         "backColor": backColor,
-        "gridHistory": gridHistory,
+        // "gridHistory": gridHistory,
         "score": score,
         "gridDims": gridDims
     }
@@ -723,7 +733,7 @@ if (!(localStorage.getItem(Version) === null)) {
     const gameObj = JSON.parse(window.localStorage.getItem(Version))
     gameGrid = gameObj.gameGrid
     backColor = gameObj.backColor
-    gridHistory = gameObj.gridHistory
+    // gridHistory = gameObj.gridHistory
     score = gameObj.score
     gridDims = gameObj.gridDims
     console.log('GAME LOADED FROM STORAGE')
