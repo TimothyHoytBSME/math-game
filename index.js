@@ -93,7 +93,6 @@ const mainLoop = function(){
                 fillRec([ pieceLeft, pieceTop, pieceSize, pieceSize], colText(pieceColor))
 
 
-                //todo draw piece.value
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
                 // shadowText(pieceLeft+pieceSize/2, pieceTop+pieceSize/2, piece.value, pieceSize/2, "black")
@@ -156,7 +155,6 @@ const mainLoop = function(){
                                 }
                             }
                         }else if(chain.length>0){
-                            //todo remove chain back to target
                             var done = false
                             while(!done){
                                 if(arrEq(chain[chain.length-1],target)){
@@ -240,9 +238,6 @@ const mainLoop = function(){
         }
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
-
-
-        //todo FORMULA TEXT
 
         const valtodisp = formula + " = " + formVal
         ctx.textAlign = "center"
@@ -373,7 +368,6 @@ const getValFromFormula = function(theFormula){
     var formcopy = theFormula
     console.log('theFormula',formcopy)
     for(var i=0; i<parCount; i++){
-        //todo replace inside parenth with equal value
         var inside = ""
         const start = parCount-i
         inside = formcopy[start]
@@ -385,7 +379,6 @@ const getValFromFormula = function(theFormula){
         const insideVal = getValFromText(inside).toString()
         const newform = formcopy.replace("("+inside+")",insideVal);
         formcopy = newform
-        // console.log('formcopy',formcopy)
 
     }
 
@@ -480,7 +473,7 @@ const getValFromText = function(text){
 
 const checkRelease = function(){
     if(gameActive){
-        //Todo release action
+        //TODO release action (compare to goal, etc.)
         selected = [-1,-1]
         target = [-1,-1]
         chain = []
@@ -538,7 +531,6 @@ const click = function(){
             gameActive = false;
         }
 
-        //todo click grid to reset or new if noMovesLeft and/or won
         var wid = 0;
         if(verticalOrien){
             wid = gameRec[2]
@@ -580,7 +572,6 @@ const genGrid = function(){
             const row = []
             for(var j=0; j<gridDims[1]; j++){
                 var piece = []
-                //todo, make actual pieces
                 piece = {
                     color: [123,123,123],
                     value: "9",
@@ -616,9 +607,100 @@ const genGrid = function(){
 
     console.log('grid', gameGrid)
 
+    //todo generate goal
+
+    const genGoal = function(){
+        const minTiles = 5  //needs to be odd, and at least 3
+        var thisChain = []
+
+        //find start tile (must be number)
+        var startP = []
+        var foundStart = false
+        while(!foundStart){
+            startP = [floor(random()*gridDims[0]),floor(random()*gridDims[1])]
+            if(!isNaN(parseInt(gameGrid[startP[0]][startP[1]].value))){
+                foundStart = true
+            }else{
+                console.log('finding new start')
+            }
+        }
+        thisChain.push(startP)
+        console.log('startFound',startP, gameGrid[startP[0]][startP[1]].value)
+        
+        while(thisChain.length < minTiles){
+            //find next op/number pair
+            var nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
+            if((!includesPoint(thisChain,nextPoint))&&(isNaN(gameGrid[nextPoint[0]][nextPoint[1]].value))){
+                //unused operator found
+                thisChain.push(nextPoint)
+            }else{
+                //failed, restart
+                genGoal()
+                return
+            }
+
+            //todo fail if start was 1 and this op is mult or div
+
+
+            nextPoint = getRandomNeighbor(thisChain[thisChain.length-1])
+            if((!includesPoint(thisChain,nextPoint))&&(!isNaN(gameGrid[nextPoint[0]][nextPoint[1]].value))){
+                //unused number found
+                thisChain.push(nextPoint)
+            }else{
+                //failed, restart
+                genGoal()
+                return
+            }
+
+            //todo fail if this op is mult or div and this num is 1
+        }
+        
+        console.log('goalChainBuilt',thisChain)
+
+        const goalForm = makeFormula(thisChain)
+        console.log('goalFormula',goalForm)
+
+        const theVal = getValFromFormula(goalForm)
+        console.log('goalVal',theVal)
+
+    }
+
+    genGoal()
+
+
     saveGame()
 }
 
+const getRandomNeighbor = function(point){
+
+    const choices = [
+        [point[0],point[1]+1],
+        [point[0],point[1]-1],
+        [point[0]-1,point[1]-1],
+        [point[0]-1,point[1]],
+        [point[0]-1,point[1]+1],
+        [point[0]+1,point[1]-1],
+        [point[0]+1,point[1]],
+        [point[0]+1,point[1]+1]
+    ]
+
+    var found = false;
+    while(!found){
+        var choice = choices[floor(random()*choices.length)]
+        if((choice[0]>-1)&&(choice[1]>-1)){
+            if(choice[0] < gridDims[0]){
+                if(choice[1] < gridDims[1]){
+                    //choice exists
+                    found = true
+                }
+            }
+        }
+    }
+    
+    return choice
+}
+
+//todo save the necessities
 const saveGame = function(){
     const gameObj = {
         "gameGrid": gameGrid,
@@ -633,6 +715,8 @@ const saveGame = function(){
     console.log("GAME SAVED")
 }
 
+
+//TODO Load game
 /*
 if (!(localStorage.getItem(Version) === null)) {
     //load game
