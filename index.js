@@ -20,10 +20,10 @@ var newBox = []
 var menuBox = []
 var returnBox = []
 var score = 0;
-var wonThis = false;
+// var wonThis = false;
 var gameActive = true;
 // var isColorMode = true;
-var noMovesLeft = false;
+// var noMovesLeft = false;
 // const colTolerance = 4;  //fundamental 
 // const grayTolerance = 2; //fundamental
 // const genTolMult = 10; //fundamental
@@ -263,32 +263,32 @@ const mainLoop = function(){
         ctx.textBaseline = 'bottom'
         
         
-        if(noMovesLeft&&(!winner)&&(!wonThis)){
-            const wid = Math.min(gameRec[2],gameRec[3])/2
-            fillRec([gameCent[0]-wid/2,gameCent[1]-wid/2,wid,wid],colText(backColor))
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            shadowText(gameCent[0], gameCent[1], "TRY AGAIN", textH, "black")
-            fillText(gameCent[0], gameCent[1], "TRY AGAIN", textH, "red")
-            ctx.textAlign = 'left'
-            ctx.textBaseline = 'bottom'
-        }
-        if((winner)||wonThis){
-            var wid = Math.min(gameRec[2],gameRec[3])
-            fillRec([gameCent[0]-wid/2,gameCent[1]-wid/2,wid,wid],colText(backColor))
-            if(!wonThis){
-                wonThis = true;
-                score++
-                saveGame()
-            }
-            ctx.textBaseline = 'middle'
-            ctx.textAlign = 'center'
-            shadowText(gameCent[0], gameCent[1], "YOU WON!", textH, "black")
-            fillText(gameCent[0], gameCent[1], "YOU WON!", textH, "green")
-            ctx.textAlign = 'left'
-            ctx.textBaseline = 'bottom'
+        // if(noMovesLeft&&(!winner)&&(!wonThis)){
+        //     const wid = Math.min(gameRec[2],gameRec[3])/2
+        //     fillRec([gameCent[0]-wid/2,gameCent[1]-wid/2,wid,wid],colText(backColor))
+        //     ctx.textAlign = 'center'
+        //     ctx.textBaseline = 'middle'
+        //     shadowText(gameCent[0], gameCent[1], "TRY AGAIN", textH, "black")
+        //     fillText(gameCent[0], gameCent[1], "TRY AGAIN", textH, "red")
+        //     ctx.textAlign = 'left'
+        //     ctx.textBaseline = 'bottom'
+        // }
+        // if((winner)||wonThis){
+        //     var wid = Math.min(gameRec[2],gameRec[3])
+        //     fillRec([gameCent[0]-wid/2,gameCent[1]-wid/2,wid,wid],colText(backColor))
+        //     if(!wonThis){
+        //         wonThis = true;
+        //         score++
+        //         saveGame()
+        //     }
+        //     ctx.textBaseline = 'middle'
+        //     ctx.textAlign = 'center'
+        //     shadowText(gameCent[0], gameCent[1], "YOU WON!", textH, "black")
+        //     fillText(gameCent[0], gameCent[1], "YOU WON!", textH, "green")
+        //     ctx.textAlign = 'left'
+        //     ctx.textBaseline = 'bottom'
 
-        }
+        // }
     }else{
         //paused
         returnBox = [gameRec[0]+gameRec[2]-textXoff*5-textW, gameRec[1]+gameRec[3]-textH, textW*2, textH]
@@ -316,13 +316,13 @@ const mainLoop = function(){
     if((!soundPlayed)&&(audioAllowed)){
         
         
-        if(winner||wonThis){
-            pop_high.play()
-        }else if(noMovesLeft){
-            pop_low.play()
-        }else{
-            pop_mid.play()
-        }
+        // if(winner||wonThis){
+        //     pop_high.play()
+        // }else if(noMovesLeft){
+        //     pop_low.play()
+        // }else{
+        //     pop_mid.play()
+        // }
         soundPlayed = true;
     }
 
@@ -492,23 +492,23 @@ const checkRelease = function(){
 }
 
 const doNew = function(){
-    if(wonThis){
-        //TODO do next, otherwise, do new of same
-    }
-    wonThis = false;
-    gridHistory = []
+    // if(wonThis){
+    //     //TODO do next, otherwise, do new of same
+    // }
+    // wonThis = false;
+    // gridHistory = []
     genGrid()
 }
 
-const doReset = function(){
-    if(gridHistory.length > 0){
-        gameGrid = []
-        const prevGrid = JSON.parse(JSON.stringify(gridHistory[0]))
-        gameGrid = JSON.parse(JSON.stringify(prevGrid));
-        gridHistory = []
-        saveGame()
-    }
-}
+// const doReset = function(){
+//     if(gridHistory.length > 0){
+//         gameGrid = []
+//         const prevGrid = JSON.parse(JSON.stringify(gridHistory[0]))
+//         gameGrid = JSON.parse(JSON.stringify(prevGrid));
+//         // gridHistory = []
+//         saveGame()
+//     }
+// }
 
 const click = function(){
     if(gameActive){
@@ -547,17 +547,17 @@ const click = function(){
             wid = gameRec[3]
         }
 
-        if((mdX > (gameCent[0] - wid/2))&&(mdY > (gameCent[1] - wid/2))&&(mdX < (gameCent[0] + wid/2))&&(mdY < (gameCent[1] + wid/2))){
-            console.log('clicked grid')
-            if(wonThis){
-                //do new
-                doNew()
+        // if((mdX > (gameCent[0] - wid/2))&&(mdY > (gameCent[1] - wid/2))&&(mdX < (gameCent[0] + wid/2))&&(mdY < (gameCent[1] + wid/2))){
+        //     console.log('clicked grid')
+        //     if(wonThis){
+        //         //do new
+        //         doNew()
             
-            }else if(noMovesLeft){
-                //do reset
-                doReset()
-            }
-        }
+        //     }else if(noMovesLeft){
+        //         //do reset
+        //         doReset()
+        //     }
+        // }
 
     }else{
         if((mdX > (returnBox[0]))&(mdY > returnBox[1])&&(mdX < (returnBox[0]+returnBox[2]))&&(mdY<(returnBox[1]+returnBox[3]))){
@@ -712,17 +712,17 @@ const getRandomNeighbor = function(point){
 
 //todo save the necessities
 const saveGame = function(){
-    const gameObj = {
-        "gameGrid": gameGrid,
-        "backColor": backColor,
-        // "gridHistory": gridHistory,
-        "score": score,
-        "gridDims": gridDims
-    }
+    // const gameObj = {
+    //     "gameGrid": gameGrid,
+    //     "backColor": backColor,
+    //     // "gridHistory": gridHistory,
+    //     "score": score,
+    //     "gridDims": gridDims
+    // }
 
-    const gameString = JSON.stringify(gameObj)
-    window.localStorage.setItem(Version,gameString)
-    console.log("GAME SAVED")
+    // const gameString = JSON.stringify(gameObj)
+    // window.localStorage.setItem(Version,gameString)
+    // console.log("GAME SAVED")
 }
 
 
