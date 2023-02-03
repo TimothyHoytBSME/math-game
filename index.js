@@ -7,27 +7,14 @@ var selected = [-1,-1]
 var target = [-1,-1]
 var pieceSize = 1;
 var textW = 1;
-// var newColor = [0,0,0]
 var backColor = [20,20,20];
-// var gridHistory = []
 var gameCent = []
 var gameGrid = []
 var gridDims = [6,5]
-// var solution = []
-// var undoBox = []
 var newBox = []
-// var resetBox = []
 var menuBox = []
 var returnBox = []
-// var wonThis = false;
 var gameActive = true;
-// var isColorMode = true;
-// var noMovesLeft = false;
-// const colTolerance = 4;  //fundamental 
-// const grayTolerance = 2; //fundamental
-// const genTolMult = 10; //fundamental
-// var matchTolerance = 300;
-// var genTolerance = 200;
 const ops = ["+","×","-","÷"]
 var chain = []
 var formula = "??"
@@ -51,23 +38,16 @@ var calculatingGoal = false;
 const mainLoop = function(){
     const currTime = new Date();
     const lapse = currTime - startTime
-    // const frameLapse = lapse - dlastLapse
-    
-    
-
-    //clearframe
     ctx.fillStyle = "rgb(0, 0, 0)"; ctx.fillRect(0, 0, cWidth, cHeight);
 
     /////////////////////////draw/////////////////////////
 
-    //gameRec
     fillRec(gameRec, colText(backColor))
     
     gameCent = [gameRec[0]+gameRec[2]/2, gameRec[1] + gameRec[3]/2]
 
     if(gameActive){
 
-        //gridcalcs
         if(verticalOrien){
             gridSize[0] = gridDims[1]
             gridSize[1] = gridDims[0]
@@ -77,8 +57,7 @@ const mainLoop = function(){
             gridSize[0] = gridDims[0]
             size = (gameRec[3]-marg*8)/gridSize[1]
         }
-        // console.log('gridSize', gridSize)
-        //pieces
+
         for(var i = 0; i<gridSize[0]; i++){
             for(var j = 0; j<gridSize[1]; j++){
                 
@@ -97,20 +76,15 @@ const mainLoop = function(){
                 pieceSize = size-marg;
                 const pieceLeft = gridPos[0]+i*size+marg/2
                 const pieceTop = gridPos[1]+j*size+marg/2
-                
 
-                // console.log('drawing piece', piece)
                 var pieceColor = isInChain? (formVal == currentGoal)? [0,123,0] : [123,123,0] : piece.color
                 fillRec([ pieceLeft, pieceTop, pieceSize, pieceSize], colText(pieceColor))
 
-
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
-                // shadowText(pieceLeft+pieceSize/2, pieceTop+pieceSize/2, piece.value, pieceSize/2, "black")
                 fillText(pieceLeft+pieceSize/2, pieceTop+pieceSize/2, piece.value, pieceSize/2, "white")
                 ctx.textAlign = 'left'
                 ctx.textBaseline = 'bottom'
-
 
                 if(mouseDownCan){
                     if(((mdX >= pieceLeft)&&(mdX <= (pieceLeft+pieceSize)))&&((mdY >= pieceTop)&&(mdY <= (pieceTop+pieceSize)))){
@@ -124,8 +98,6 @@ const mainLoop = function(){
                             formula = makeFormula(chain)
                             formVal = getValFromFormula(formula)
                         }
-                        
-                        // console.log(chain)
                     }
 
                     if(((mX >= (pieceLeft+marg))&&(mX <= (pieceLeft+pieceSize-marg)))&&((mY >= (pieceTop+marg))&&(mY <= (pieceTop+pieceSize-marg)))){
@@ -147,12 +119,10 @@ const mainLoop = function(){
                                 [prev[0]+1,prev[1]],
                                 [prev[0]+1,prev[1]+1]
                             ]
-                            // console.log('target',target, 'prev', prev)
-                            // console.log('choices',choices)
+
                             if(includesPoint(choices,target)){
                                 if(gameGrid[prev[0]][prev[1]].type == "number"){
                                     if(gameGrid[target[0]][target[1]].type == "operator"){
-                                        // console.log('prevtargtype',gameGrid[prev[0]][prev[1]].type,gameGrid[target[0]][target[1]].type)
                                         chain.push([...target])
                                         formula = makeFormula(chain)
                                         formVal = getValFromFormula(formula)
@@ -185,30 +155,12 @@ const mainLoop = function(){
                 }
             }
         }
-
-        //////////////////////////evaluation////////////////////////
-
-        noMovesLeft = false //change to true when algorithm is correct
-        var winner = false
-
-        //no moves/winner  algorithm
-        for(var i = 0; i<gameGrid.length; i++){
-            for(var j = 0; j<gameGrid[0].length; j++){
-                // todo calculate winner = true
-                // todo calculate nomoremoves = true
-            }
-        }
     }else{
-        //paused
-
-
+        console.log('Game Paused')
     }
 
-    
-    
 
     /////////////////////////////text/////////////////////////////////////
-
     
     if(verticalOrien){
         textW = gameRec[2]/5
@@ -222,16 +174,12 @@ const mainLoop = function(){
 
     if(gameActive){
         undoBox = [gameRec[0]+textXoff, gameRec[1]+textYoff, textW, textH]
-        // shadowText(undoBox[0], undoBox[1]+undoBox[3], "UNDO", undoBox[3], "black")
-        // fillText(undoBox[0], undoBox[1]+undoBox[3], "UNDO", undoBox[3], "white")
         
         newBox = [gameRec[0]+gameRec[2]-textW, gameRec[1]+textYoff, textW*0.75, textH]
         shadowText(newBox[0], newBox[1]+newBox[3], "NEW", newBox[3], "black")
         fillText(newBox[0], newBox[1]+newBox[3], "NEW", newBox[3], "white")
 
         resetBox = [gameRec[0]+textXoff, gameRec[1]+gameRec[3]-textH, textW, textH]
-        // shadowText(resetBox[0], resetBox[1]+resetBox[3], "RESET", resetBox[3], "black")
-        // fillText(resetBox[0], resetBox[1]+resetBox[3], "RESET", resetBox[3], "white")
 
         menuBox = [gameRec[0]+gameRec[2]-textXoff*2-textW, gameRec[1]+gameRec[3]-textH, textW, textH]
         shadowText(menuBox[0], menuBox[1]+menuBox[3], "MENU", menuBox[3], "black")
@@ -277,34 +225,6 @@ const mainLoop = function(){
         ctx.textAlign = "left"
         ctx.textBaseline = 'bottom'
         
-
-        
-        // if(noMovesLeft&&(!winner)&&(!wonThis)){
-        //     const wid = Math.min(gameRec[2],gameRec[3])/2
-        //     fillRec([gameCent[0]-wid/2,gameCent[1]-wid/2,wid,wid],colText(backColor))
-        //     ctx.textAlign = 'center'
-        //     ctx.textBaseline = 'middle'
-        //     shadowText(gameCent[0], gameCent[1], "TRY AGAIN", textH, "black")
-        //     fillText(gameCent[0], gameCent[1], "TRY AGAIN", textH, "red")
-        //     ctx.textAlign = 'left'
-        //     ctx.textBaseline = 'bottom'
-        // }
-        // if((winner)||wonThis){
-        //     var wid = Math.min(gameRec[2],gameRec[3])
-        //     fillRec([gameCent[0]-wid/2,gameCent[1]-wid/2,wid,wid],colText(backColor))
-        //     if(!wonThis){
-        //         wonThis = true;
-        //         score[difficulty]++
-        //         saveGame()
-        //     }
-        //     ctx.textBaseline = 'middle'
-        //     ctx.textAlign = 'center'
-        //     shadowText(gameCent[0], gameCent[1], "YOU WON!", textH, "black")
-        //     fillText(gameCent[0], gameCent[1], "YOU WON!", textH, "green")
-        //     ctx.textAlign = 'left'
-        //     ctx.textBaseline = 'bottom'
-
-        // }
     }else{
         //paused
         returnBox = [gameRec[0]+gameRec[2]-textXoff*5-textW, gameRec[1]+gameRec[3]-textH, textW*2, textH]
@@ -356,12 +276,10 @@ const makeFormula = function(theChain){
         theFormula = currentVal + theFormula
         
         if((currentVal == "÷")||(currentVal == "×")){
-            //if it is, add closing parenth, then currentval
             
             if(theChain[i-2]){
                 prevOp = gameGrid[theChain[i-2][0]][theChain[i-2][1]].value
                 if((prevOp =="+")||(prevOp == "-")){
-                    //need parenth
                     parenthCount++
                     theFormula = ")" + theFormula
                 }
@@ -381,7 +299,6 @@ const getValFromFormula = function(theFormula){
     var done = false;
     var ind = 0
     while(!done){
-        // console.log(theFormula[ind])
         if(theFormula[ind] == "("){
             parCount++
         }else{
@@ -391,7 +308,7 @@ const getValFromFormula = function(theFormula){
     }
 
     var formcopy = theFormula
-    // console.log('theFormula',formcopy)
+
     for(var i=0; i<parCount; i++){
         var inside = ""
         const start = parCount-i
@@ -406,13 +323,8 @@ const getValFromFormula = function(theFormula){
         formcopy = newform
 
     }
-
     
-    
-    
-    // console.log('attempting to calc', formcopy)
     const finalVal = getValFromText(formcopy).toString()
-    // console.log("FINALVAL",finalVal)
     if(!(finalVal == "??")){
         return parseFloat(parseFloat(finalVal).toFixed(precision)).toString()
     }
@@ -426,7 +338,6 @@ const getValFromText = function(text){
     var lastchar = textcopy[textcopy.length-1]
     if((lastchar == "+")||(lastchar == "-")||(lastchar == "×")||(lastchar == "÷")){
         textcopy = textcopy.slice(0,-1);
-        // console.log('removed unused operator',textcopy)
     }
 
 
@@ -440,14 +351,12 @@ const getValFromText = function(text){
     var val = "??"
 
     if(docalc){
-        // console.log('calculating',textcopy)
 
         var firstchar = textcopy[0]
         val = 1
         if(firstchar == "-"){
             val = -1
             textcopy = textcopy.slice(1,textcopy.length)
-            // console.log('leading - removed', textcopy)
         }
 
         var firstnumtext = ""
@@ -457,18 +366,14 @@ const getValFromText = function(text){
                 done = true
             }else{
                 firstnumtext = firstnumtext + textcopy[0]
-                // console.log('building dec', firstnumtext)
                 textcopy = textcopy.slice(1,textcopy.length)
             }
         }
 
         val = val*parseFloat(firstnumtext)
-        // console.log('firstVal',val)
 
         for(var i=1; i<textcopy.length; i++){
             if(!isEven(i)){
-                //apply num with op to prev val
-                // console.log('currentchar',textcopy[i])
                 const numb = parseInt(textcopy[i])
                 const op = textcopy[i-1]
                 switch(op) {
@@ -487,7 +392,6 @@ const getValFromText = function(text){
                     default:
                         val = val
                 }
-                // console.log('valnextstep',val)
             }
         }
     }
@@ -501,20 +405,13 @@ const checkRelease = function(){
         if(formVal == currentGoal){
             console.log('match made')
             score[difficulty*typesOfGoals.length + typeOfGoalNum]++
-            ///////////todo delete and replace tile values:
 
-            //if chain count is even, remove last (ends in op)
             if(isEven(chain.length)){
-                // console.log('chain was even')
                 chain.pop()
-                // console.log('trimmed chain',chain)
             }
 
-            //calc num ops (chain length -1)/2
             const numOps = (chain.length-1)/2
-            // console.log('numOps',numOps)
 
-            //TODO if typeofgoal is decimal, there was a division symbol, there must be one in new tiles
             var hadDiv = false;
             for(var i=0; i<chain.length; i++){
                 if(gameGrid[chain[i][0]][chain[i][1]].value == "÷"){
@@ -526,7 +423,6 @@ const checkRelease = function(){
                 divPlaced = false
             }
 
-            //pick same number of random tiles of chain to be ops, replace vals
             var changed = new Array(chain.length).fill(false)
             for(var i=0; i<numOps; i++){
                 found = false;
@@ -547,7 +443,6 @@ const checkRelease = function(){
                 }
             }
 
-            //replace remaining with random numbers
             for(var i=0; i<chain.length;i++){
                 if(!changed[i]){
                     var point =[...chain[i]]
@@ -559,10 +454,8 @@ const checkRelease = function(){
             }
 
             gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum] = JSON.parse(JSON.stringify(gameGrid))
-            
-            //generate new goal
-            genGoal()
 
+            genGoal()
             saveGame()
         }
         selected = [-1,-1]
@@ -574,11 +467,6 @@ const checkRelease = function(){
 }
 
 const doNew = function(){
-    // if(wonThis){
-    //     //TODO do next, otherwise, do new of same
-    // }
-    // wonThis = false;
-    // gridHistory = []
     score[difficulty*typesOfGoals.length + typeOfGoalNum] = 0;
     genGrid()
 }
@@ -656,7 +544,6 @@ const genGrid = function(){
 
     console.log('generating new grid')
     gameGrid = []
-    // score[difficulty*typesOfGoals.length + typeOfGoalNum] = 0;
 
     console.log("scores", score)
     const tot = gridDims[0]*gridDims[1]
@@ -677,26 +564,22 @@ const genGrid = function(){
                 piece.value = floor(random()*9+1).toString()
 
                 if(random() < opRatio){
-                    //operator
                     piece.value = ops[floor(random()*4)]
                     piece.type = "operator"
                     opCount++
                 }   
-
                 row.push(piece)
             }
             gameGrid.push(row)
         }
-        // console.log('opCount',opCount)
+
         if(opCount != opNum){
-            // console.log('opMin', opMin, 'opMax', opMax)
             console.log('Number of operators no good, redoing grid')
             opCount = 0;
             gameGrid = []
             ranGrid()
         }
 
-        //todo if no division & typeofgoal is decimal
         if(typeOfGoal=="decimal"){
             var hasDivision = false
             for(var i=0; i<gridDims[0]; i++){
@@ -720,14 +603,8 @@ const genGrid = function(){
 
     console.log('grid', gameGrid)
 
-    //todo generate goal
-
-    
-
     genGoal()
-
     gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum] = JSON.parse(JSON.stringify(gameGrid))
-
     saveGame()
 }
 
@@ -750,24 +627,18 @@ const genGoal = function(){
     const minTiles = 3+difficulty*2  //needs to be odd, and at least 3
     var thisChain = []
 
-    //find start tile (must be number)
     var startP = []
     var foundStart = false
     while(!foundStart){
         startP = [floor(random()*gridDims[0]),floor(random()*gridDims[1])]
         if(!isNaN(parseInt(gameGrid[startP[0]][startP[1]].value))){
             foundStart = true
-        }else{
-            // console.log('finding new start')
         }
     }
     thisChain.push(startP)
-    // console.log('startFound',startP, gameGrid[startP[0]][startP[1]].value)
     
     while(thisChain.length < minTiles){
-        //find next op/number pair
 
-        //if operator not possible fail
         var choices = [
             [thisChain[thisChain.length-1][0],thisChain[thisChain.length-1][1]+1],
             [thisChain[thisChain.length-1][0],thisChain[thisChain.length-1][1]-1],
@@ -778,27 +649,20 @@ const genGoal = function(){
             [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]],
             [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]+1]
         ]
-        // console.log('choices',choices)
 
         var opAvail = false;
         for (var i = 0; i<choices.length; i++){
             var p = [...choices[i]]
             var pisvalid = (p[0]>-1)? (p[1]>-1)? (p[0]<gridDims[0])? (p[1]<gridDims[1])? true : false : false : false : false
-            // console.log("p is valid", p)
             if(!(includesPoint(thisChain,p))&&pisvalid){
-                // console.log('p',p)
                 var v = gameGrid[p[0]][p[1]].value
-                // console.log('valtocheck', v)
                 if((v==ops[0])||(v==ops[1])||(v==ops[2])||(v==ops[3])){
-                    //is an available op
-                    // console.log('OP AVAILABLE')
                     opAvail = true
                 }
             }
         }
 
         if(!opAvail){
-            //failed, restart
             console.log('failed to make goal, noOp dead end, retrying')
             genGoal()
             return
@@ -810,16 +674,7 @@ const genGoal = function(){
         }
 
         thisChain.push(nextPoint)
-        // console.warn('OPFOUND')
-        
 
-
-        //todo fail if start was 1 and this op is mult or div
-
-        
-
-        //todo fail if no number available, instead of random pick not number
-         //if number not possible fail
         choices = [
             [thisChain[thisChain.length-1][0],thisChain[thisChain.length-1][1]+1],
             [thisChain[thisChain.length-1][0],thisChain[thisChain.length-1][1]-1],
@@ -830,27 +685,20 @@ const genGoal = function(){
             [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]],
             [thisChain[thisChain.length-1][0]+1,thisChain[thisChain.length-1][1]+1]
         ]
-        // console.log('choices',choices)
 
         var numAvail = false;
         for (var i = 0; i<choices.length; i++){
             var p = [...choices[i]]
             var pisvalid = (p[0]>-1)? (p[1]>-1)? (p[0]<gridDims[0])? (p[1]<gridDims[1])? true : false : false : false : false
-            // console.log("p is valid", p)
             if(!(includesPoint(thisChain,p))&&pisvalid){
-                // console.log('p',p)
                 var v = gameGrid[p[0]][p[1]].value
-                // console.log('valtocheck', v)
                 if(!isNaN(parseInt(v))){
-                    //is an available op
-                    // console.log('num AVAILABLE')
                     numAvail = true
                 }
             }
         }
 
         if(!numAvail){
-            //failed, restart
             console.log('failed to make goal, noNum dead end, retrying')
             genGoal()
             return
@@ -862,31 +710,21 @@ const genGoal = function(){
         }
 
         thisChain.push(nextPoint)
-        // console.warn('NUMFOUND')
 
-        //todo fail if this op is mult or div and this num is 1
     }
-    
-    // console.log('goalChainBuilt',thisChain)
 
     const goalForm = makeFormula(thisChain)
-
     const theVal = getValFromFormula(goalForm)
-
-    //todo fail if not obide by typOfGoal ("both", "decimal", "integer")
-    
 
     if(!(typeOfGoal == "both")){
         if(isInt(parseFloat(theVal))){
             if(typeOfGoal == "decimal"){
-                //failed, restart
                 console.error('failed to make goal, not decimal, retrying')
                 genGoal()
                 return
             }
         }else{
             if(typeOfGoal == "integer"){
-                //failed, restart
                 console.error('failed to make goal, not integer, retrying')
                 genGoal()
                 return
@@ -894,13 +732,10 @@ const genGoal = function(){
         }
     }
     
-
     currentGoal = theVal
     goals[difficulty*typesOfGoals.length + typeOfGoalNum] = theVal
     console.log('goalFormula',goalForm)
     console.log('goalVal',theVal)
-
-
 }
 
 const getRandomNeighbor = function(point){
@@ -922,7 +757,6 @@ const getRandomNeighbor = function(point){
         if((choice[0]>-1)&&(choice[1]>-1)){
             if(choice[0] < gridDims[0]){
                 if(choice[1] < gridDims[1]){
-                    //choice exists
                     found = true
                 }
             }
@@ -932,7 +766,6 @@ const getRandomNeighbor = function(point){
     return choice
 }
 
-//todo save the necessities
 const saveGame = function(){
     const gameObj = {
         "gameGrids": JSON.parse(JSON.stringify(gameGrids)),
@@ -952,7 +785,6 @@ const saveGame = function(){
 
 const loadGameDataIfAble = function(){
     if (!(localStorage.getItem(Version) === null)) {
-        //load game
         const gameObj = JSON.parse(window.localStorage.getItem(Version))
         gameGrids = JSON.parse(JSON.stringify(gameObj.gameGrids))
         typeOfGoalNum = gameObj.typeOfGoalNum
@@ -965,11 +797,8 @@ const loadGameDataIfAble = function(){
         goals = [...gameObj.goals]
         gameGrid = JSON.parse(JSON.stringify(gameGrids[difficulty*typesOfGoals.length + typeOfGoalNum]))
         currentGoal = goals[difficulty*typesOfGoals.length + typeOfGoalNum]
-        
-        
 
         console.log('GAME LOADED FROM STORAGE')
-        console.log(JSON.stringify(gameObj))
     }else{
     
         genGrid()
@@ -980,5 +809,4 @@ loadGameDataIfAble()
 
 
 
-// genGrid()
 
