@@ -31,6 +31,7 @@ var score = [0,0,0,0,0,0,0,0,0]; //EASY(int,both,dec),CHALLENGE(int,both,dec),IM
 var gameGrids = new Array(score.length).fill([])
 var goals = new Array(score.length).fill("9999999999.88")
 var calculatingGoal = false;
+// var requestNew = false;
 
 
 
@@ -467,8 +468,13 @@ const checkRelease = function(){
 }
 
 const doNew = function(){
-    score[difficulty*typesOfGoals.length + typeOfGoalNum] = 0;
-    genGrid()
+    
+    // requestNew = true;
+
+    if (confirm('This will erase your score for the current game type. Are you sure?')) {
+        score[difficulty*typesOfGoals.length + typeOfGoalNum] = 0;
+        genGrid()
+    }
 }
 
 // const doReset = function(){
@@ -589,8 +595,23 @@ const genGrid = function(){
                     }
                 }
             }
-            if(divisionCount < 2){
+            if(divisionCount < 3){
                 console.warn('Not enough division operators')
+                opCount = 0;
+                gameGrid = []
+                ranGrid()
+            }
+        }else if(typeOfGoal == "integer"){
+            notdiviscount = 0;
+            for(var i=0; i<gridDims[0]; i++){
+                for(var j=0; j<gridDims[1]; j++){
+                    if(!(gameGrid[i][j].value == "÷")){
+                        notdiviscount++
+                    }
+                }
+            }
+            if(notdiviscount < 4){
+                console.warn('Not enough non-division operators')
                 opCount = 0;
                 gameGrid = []
                 ranGrid()
